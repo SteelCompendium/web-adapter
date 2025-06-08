@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statblock Converter</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        h1 { text-align: center; }
+        .container { display: flex; width: 90%; height: 70vh; }
+        textarea { flex-grow: 1; margin: 5px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin-top: 10px; padding: 10px 20px; border-radius: 5px; border: none; background-color: #007bff; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Statblock Converter</h1>
+    <div class="container">
+        <textarea id="input" placeholder="Paste your statblock here..."></textarea>
+        <textarea id="output" placeholder="Converted output will appear here..." readonly></textarea>
+    </div>
+    <button id="convert-btn">Convert</button>
+
+    <script>
+        document.getElementById('convert-btn').addEventListener('click', () => {
+            const input = document.getElementById('input').value;
+            // Stubbed conversion logic
+            const output = "Converted: " + input;
+            document.getElementById('output').value = output;
+        });
+    </script>
+</body>
+</html> 
