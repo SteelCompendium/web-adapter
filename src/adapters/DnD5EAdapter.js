@@ -1,11 +1,11 @@
 import BaseAdapter from "./BaseAdapter";
 
 class DnD5EAdapter extends BaseAdapter {
-	getName() {
+	getName () {
 		return "D&D 5E";
 	}
 
-	parse(text) {
+	parse (text) {
 		// TODO: Implement D&D 5E parsing logic
 		// This is a placeholder implementation
 		const lines = text.split("\n");
@@ -53,7 +53,7 @@ class DnD5EAdapter extends BaseAdapter {
 		return statblock;
 	}
 
-	format(statblock) {
+	format (statblock) {
 		// TODO: Implement D&D 5E formatting logic
 		// This is a placeholder implementation
 		let output = `${statblock.name}\n`;

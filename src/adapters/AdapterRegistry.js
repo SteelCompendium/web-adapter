@@ -1,5 +1,6 @@
 import DnD5EAdapter from "./DnD5EAdapter";
 import DSAdapter from "./DSAdapter";
+import validator from "../validation/validator";
 
 class AdapterRegistry {
 	constructor() {
@@ -37,7 +38,38 @@ class AdapterRegistry {
 		const standardizedStatblock = sourceAdapter.parse(text);
 
 		// Format the standardized statblock into the target format
-		return targetAdapter.format(standardizedStatblock);
+		const result = targetAdapter.format(standardizedStatblock);
+
+		// If the target format is JSON, validate it against the schema
+		if (targetFormat.toLowerCase().includes("json") || this.isJSONFormat(result)) {
+			try {
+				const validationResult = validator.validateJSON(result);
+				if (!validationResult.valid) {
+					const errorMessages = validator.formatErrors(validationResult.errors);
+					// eslint-disable-next-line no-console
+					console.warn("Generated JSON does not conform to schema:", errorMessages);
+					// Note: We're not throwing an error here to avoid breaking existing functionality
+					// but we log the validation issues for debugging
+				}
+			} catch (validationError) {
+				// eslint-disable-next-line no-console
+				console.warn("Could not validate generated JSON:", validationError.message);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Helper method to detect if a string is JSON format
+	 * @param {string} text - The text to check
+	 * @returns {boolean} - True if the text appears to be JSON
+	 */
+	isJSONFormat(text) {
+		if (typeof text !== "string") return false;
+		const trimmed = text.trim();
+		return (trimmed.startsWith("{") && trimmed.endsWith("}"))
+			|| (trimmed.startsWith("[") && trimmed.endsWith("]"));
 	}
 }
 
