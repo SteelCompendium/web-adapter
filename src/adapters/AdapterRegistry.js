@@ -1,46 +1,46 @@
-import DnD5EAdapter from './DnD5EAdapter';
-import DSAdapter from './DSAdapter';
+import DnD5EAdapter from "./DnD5EAdapter";
+import DSAdapter from "./DSAdapter";
 
 class AdapterRegistry {
-  constructor() {
-    this.adapters = new Map();
-    this.registerDefaultAdapters();
-  }
+	constructor() {
+		this.adapters = new Map();
+		this.registerDefaultAdapters();
+	}
 
-  registerDefaultAdapters() {
-    this.registerAdapter(new DnD5EAdapter());
-    this.registerAdapter(new DSAdapter());
-    // Register more default adapters here
-  }
+	registerDefaultAdapters() {
+		this.registerAdapter(new DnD5EAdapter());
+		this.registerAdapter(new DSAdapter());
+		// Register more default adapters here
+	}
 
-  registerAdapter(adapter) {
-    this.adapters.set(adapter.getName(), adapter);
-  }
+	registerAdapter(adapter) {
+		this.adapters.set(adapter.getName(), adapter);
+	}
 
-  getAdapter(name) {
-    const adapter = this.adapters.get(name);
-    if (!adapter) {
-      throw new Error(`No adapter found for format: ${name}`);
-    }
-    return adapter;
-  }
+	getAdapter(name) {
+		const adapter = this.adapters.get(name);
+		if (!adapter) {
+			throw new Error(`No adapter found for format: ${name}`);
+		}
+		return adapter;
+	}
 
-  getAvailableFormats() {
-    return Array.from(this.adapters.keys());
-  }
+	getAvailableFormats() {
+		return Array.from(this.adapters.keys());
+	}
 
-  convert(text, sourceFormat, targetFormat) {
-    const sourceAdapter = this.getAdapter(sourceFormat);
-    const targetAdapter = this.getAdapter(targetFormat);
+	convert(text, sourceFormat, targetFormat) {
+		const sourceAdapter = this.getAdapter(sourceFormat);
+		const targetAdapter = this.getAdapter(targetFormat);
 
-    // Parse the input text into a standardized format
-    const standardizedStatblock = sourceAdapter.parse(text);
+		// Parse the input text into a standardized format
+		const standardizedStatblock = sourceAdapter.parse(text);
 
-    // Format the standardized statblock into the target format
-    return targetAdapter.format(standardizedStatblock);
-  }
+		// Format the standardized statblock into the target format
+		return targetAdapter.format(standardizedStatblock);
+	}
 }
 
 // Create a singleton instance
 const registry = new AdapterRegistry();
-export default registry; 
+export default registry;
