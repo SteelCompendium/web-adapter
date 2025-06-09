@@ -1,0 +1,37 @@
+{
+  "name": "statblock-adapter-gl-pages",
+  "version": "1.0.0",
+  "description": "A web-based tool for converting tabletop RPG statblocks between different formats",
+  "main": "public/index.html",
+  "scripts": {
+    "dev": "npx serve public -p 8000",
+    "start": "npm run dev",
+    "build": "echo 'No build step required - static HTML'",
+    "test": "echo 'No tests yet - add tests for parsers and formatters'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/[your-username]/statblock-adapter-gl-pages.git"
+  },
+  "keywords": [
+    "dnd",
+    "pathfinder",
+    "rpg",
+    "statblock",
+    "converter",
+    "tabletop",
+    "github-pages"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/[your-username]/statblock-adapter-gl-pages/issues"
+  },
+  "homepage": "https://[your-username].github.io/statblock-adapter-gl-pages",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
