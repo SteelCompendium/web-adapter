@@ -1,4 +1,5 @@
 import DnD5EAdapter from './DnD5EAdapter';
+import DSAdapter from './DSAdapter';
 
 class AdapterRegistry {
   constructor() {
@@ -8,6 +9,7 @@ class AdapterRegistry {
 
   registerDefaultAdapters() {
     this.registerAdapter(new DnD5EAdapter());
+    this.registerAdapter(new DSAdapter());
     // Register more default adapters here
   }
 
