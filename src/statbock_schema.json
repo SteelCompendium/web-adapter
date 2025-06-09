@@ -1,0 +1,120 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema#",
+    "title": "Draw Steel Statblock",
+    "type": "object",
+    "required": ["name", "type", "level", "traits", "stats", "speed", "actions"],
+    "properties": {
+      "name": { "type": "string" },
+      "type": { "type": "string" },
+      "level": { "type": "integer", "minimum": 1 },
+      "traits": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "text"],
+          "properties": {
+            "name": { "type": "string" },
+            "text": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "stats": {
+        "type": "object",
+        "required": ["brawn","agility","smarts","spirit"],
+        "properties": {
+          "brawn": { "type": "integer" },
+          "agility": { "type": "integer" },
+          "smarts": { "type": "integer" },
+          "spirit": { "type": "integer" }
+        },
+        "additionalProperties": false
+      },
+      "defenses": {
+        "type": "object",
+        "properties": {
+          "toughness": { "type": "integer" },
+          "parry": { "type": "integer" }
+        },
+        "additionalProperties": false
+      },
+      "health": {
+        "type": "object",
+        "properties": {
+          "wounds": { "type": "integer" },
+          "strain": { "type": "integer" }
+        },
+        "additionalProperties": false
+      },
+      "speed": {
+        "type": "object",
+        "properties": {
+          "pace": { "type": "integer" },
+          "burrow": { "type": "integer" },
+          "climb": { "type": "integer" },
+          "fly": { "type": "integer" },
+          "swim": { "type": "integer" }
+        },
+        "additionalProperties": false
+      },
+      "skills": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "rating"],
+          "properties": {
+            "name": { "type": "string" },
+            "rating": { "type": "integer" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "powers": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "text"],
+          "properties": {
+            "name": { "type": "string" },
+            "text": { "type": "string" },
+            "trigger": { "type": "string" },
+            "cost": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "actions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "type", "text"],
+          "properties": {
+            "name": { "type": "string" },
+            "type": { "type": "string", "enum": ["standard", "move", "full", "reaction", "free"] },
+            "text": { "type": "string" },
+            "attack": {
+              "type": "object",
+              "properties": {
+                "toHit": { "type": "integer" },
+                "damage": { "type": "string" },
+                "range": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "equipment": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "loot": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "notes": { "type": "string" }
+    },
+    "additionalProperties": false
+  }
+  
