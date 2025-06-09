@@ -1,8 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="A web-based tool for converting tabletop RPG statblocks between different formats"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
     <title>Statblock Converter</title>
     <style>
         * {
@@ -221,77 +233,8 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Statblock Converter</h1>
-            <p>Convert statblocks between different formats with ease</p>
-        </div>
-
-        <div class="main-content">
-            <div class="converter-section">
-                <div class="input-section">
-                    <div class="section-header">
-                        <h3 class="section-title">Input</h3>
-                        <select class="format-selector" id="input-format">
-                            <option value="auto">Auto-detect</option>
-                            <option value="dnd5e">D&D 5e</option>
-                            <option value="pathfinder">Pathfinder</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                    </div>
-                    <textarea 
-                        class="text-area" 
-                        id="input-text" 
-                        placeholder="Paste your statblock here...&#10;&#10;Example:&#10;Goblin&#10;Small humanoid (goblinoid), neutral evil&#10;Armor Class 15 (Leather Armor, Shield)&#10;Hit Points 7 (2d6)&#10;Speed 30 ft.&#10;..."
-                    ></textarea>
-                </div>
-
-                <div class="output-section">
-                    <div class="section-header">
-                        <h3 class="section-title">Output</h3>
-                        <select class="format-selector" id="output-format">
-                            <option value="json">JSON</option>
-                            <option value="xml">XML</option>
-                            <option value="yaml">YAML</option>
-                            <option value="markdown">Markdown</option>
-                        </select>
-                    </div>
-                    <textarea 
-                        class="text-area readonly" 
-                        id="output-text" 
-                        placeholder="Converted output will appear here..."
-                        readonly
-                    ></textarea>
-                </div>
-            </div>
-
-            <div class="controls">
-                <button class="btn btn-primary" id="convert-btn">Convert</button>
-                <button class="btn btn-secondary" id="clear-btn">Clear All</button>
-                <button class="btn btn-success" id="copy-btn">Copy Output</button>
-            </div>
-
-            <div class="example-section">
-                <div class="example-title">Example Input:</div>
-                <div class="example-text">Goblin
-Small humanoid (goblinoid), neutral evil
-Armor Class 15 (Leather Armor, Shield)
-Hit Points 7 (2d6)
-Speed 30 ft.
-STR 8 (-1) DEX 14 (+2) CON 10 (+0) INT 10 (+0) WIS 8 (-1) CHA 8 (-1)</div>
-            </div>
-        </div>
-
-        <div class="status-bar">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>Ready</span>
-            </div>
-            <div>
-                <span id="char-count">0 characters</span>
-            </div>
-        </div>
-    </div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
 
     <script>
         // DOM Elements
