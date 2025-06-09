@@ -1,120 +1,194 @@
 {
-    "$schema": "http://json-schema.org/draft/2020-12/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Draw Steel Statblock",
     "type": "object",
-    "required": ["name", "type", "level", "traits", "stats", "speed", "actions"],
+    "required": ["name", "type", "ev", "stamina", "speed", "size", "stats"],
     "properties": {
-      "name": { "type": "string" },
-      "type": { "type": "string" },
-      "level": { "type": "integer", "minimum": 1 },
-      "traits": {
+      "name": {
+        "type": "string",
+        "description": "The creature's full name"
+      },
+      "tags": {
         "type": "array",
-        "items": {
-          "type": "object",
-          "required": ["name", "text"],
-          "properties": {
-            "name": { "type": "string" },
-            "text": { "type": "string" }
-          },
-          "additionalProperties": false
-        }
+        "items": { "type": "string" },
+        "description": "Any special tags or roles (e.g. Leader, Elite)"
+      },
+      "type": {
+        "type": "string",
+        "description": "Creature type (e.g. Humanoid, Beast)"
+      },
+      "subtype": {
+        "type": "string",
+        "description": "More specific subtype (e.g. Radenwight)"
+      },
+      "ev": {
+        "type": "integer",
+        "description": "Encounter Value"
+      },
+      "stamina": {
+        "type": "integer",
+        "description": "Hit points or stamina pool"
+      },
+      "speed": {
+        "type": ["integer", "string"],
+        "description": "Base speed (may include special modes like climb)"
+      },
+      "size": {
+        "type": "string",
+        "description": "Size category (e.g. 1S, 2M)"
+      },
+      "stability": {
+        "type": "integer",
+        "description": "Defensive stability rating"
+      },
+      "free_strike": {
+        "type": "integer",
+        "description": "Free Strike rating"
       },
       "stats": {
         "type": "object",
-        "required": ["brawn","agility","smarts","spirit"],
+        "required": ["might", "agility", "reason", "intuition", "presence"],
         "properties": {
-          "brawn": { "type": "integer" },
+          "might": { "type": "integer" },
           "agility": { "type": "integer" },
-          "smarts": { "type": "integer" },
-          "spirit": { "type": "integer" }
+          "reason": { "type": "integer" },
+          "intuition": { "type": "integer" },
+          "presence": { "type": "integer" }
         },
-        "additionalProperties": false
+        "description": "Core ability modifiers"
       },
-      "defenses": {
-        "type": "object",
-        "properties": {
-          "toughness": { "type": "integer" },
-          "parry": { "type": "integer" }
-        },
-        "additionalProperties": false
-      },
-      "health": {
-        "type": "object",
-        "properties": {
-          "wounds": { "type": "integer" },
-          "strain": { "type": "integer" }
-        },
-        "additionalProperties": false
-      },
-      "speed": {
-        "type": "object",
-        "properties": {
-          "pace": { "type": "integer" },
-          "burrow": { "type": "integer" },
-          "climb": { "type": "integer" },
-          "fly": { "type": "integer" },
-          "swim": { "type": "integer" }
-        },
-        "additionalProperties": false
-      },
-      "skills": {
+      "resistances": {
         "type": "array",
-        "items": {
-          "type": "object",
-          "required": ["name", "rating"],
-          "properties": {
-            "name": { "type": "string" },
-            "rating": { "type": "integer" }
-          },
-          "additionalProperties": false
-        }
+        "items": { "type": "string" },
+        "description": "Damage types this creature resists"
       },
-      "powers": {
+      "vulnerabilities": {
         "type": "array",
-        "items": {
-          "type": "object",
-          "required": ["name", "text"],
-          "properties": {
-            "name": { "type": "string" },
-            "text": { "type": "string" },
-            "trigger": { "type": "string" },
-            "cost": { "type": "string" }
-          },
-          "additionalProperties": false
-        }
+        "items": { "type": "string" },
+        "description": "Damage types this creature is vulnerable to"
+      },
+      "immunities": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Damage types this creature is immune to"
+      },
+      "languages": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Languages known"
+      },
+      "xp": {
+        "type": "integer",
+        "description": "Experience awarded for defeating"
+      },
+      "features": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/feature" },
+        "description": "Special traits and passives"
       },
       "actions": {
         "type": "array",
-        "items": {
-          "type": "object",
-          "required": ["name", "type", "text"],
-          "properties": {
-            "name": { "type": "string" },
-            "type": { "type": "string", "enum": ["standard", "move", "full", "reaction", "free"] },
-            "text": { "type": "string" },
-            "attack": {
-              "type": "object",
-              "properties": {
-                "toHit": { "type": "integer" },
-                "damage": { "type": "string" },
-                "range": { "type": "string" }
-              },
-              "additionalProperties": false
-            }
-          },
-          "additionalProperties": false
+        "items": { "$ref": "#/definitions/action" },
+        "description": "Main Actions, Reactions, etc."
+      },
+      "maneuvers": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/action" },
+        "description": "Maneuvers and special action types"
+      },
+      "description": {
+        "type": "string",
+        "description": "Any freeform lore or notes"
+      }
+    },
+    "definitions": {
+      "feature": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "keywords": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
         }
       },
-      "equipment": {
-        "type": "array",
-        "items": { "type": "string" }
+      "action": {
+        "type": "object",
+        "required": ["name", "roll", "keywords", "range", "target"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Action name (e.g. Cacophony)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["Main Action", "Maneuver", "Reaction", "Free Action", "Passive"],
+            "description": "Action category"
+          },
+          "traits": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Special markers (e.g. Signature)"
+          },
+          "roll": {
+            "type": "object",
+            "required": ["dice", "bonus"],
+            "properties": {
+              "dice": {
+                "type": "string",
+                "pattern": "^\\d+d\\d+$",
+                "description": "Dice expression (e.g. 2d10)"
+              },
+              "bonus": {
+                "type": "integer",
+                "description": "Flat bonus added to the roll"
+              }
+            }
+          },
+          "keywords": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Descriptors (e.g. Area, Magic)"
+          },
+          "range": {
+            "type": "string",
+            "description": "Distance or area of effect"
+          },
+          "target": {
+            "type": "string",
+            "description": "Who or what is affected"
+          },
+          "outcomes": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/outcome" },
+            "description": "Outcome table entries"
+          },
+          "effect": {
+            "type": "string",
+            "description": "Additional effect text"
+          }
+        }
       },
-      "loot": {
-        "type": "array",
-        "items": { "type": "string" }
-      },
-      "notes": { "type": "string" }
-    },
-    "additionalProperties": false
+      "outcome": {
+        "type": "object",
+        "required": ["symbol", "description"],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "enum": ["✦", "★", "✸"]
+          },
+          "threshold": {
+            "type": "string",
+            "description": "Roll range or condition (e.g. ≤11, 12–16)"
+          },
+          "description": {
+            "type": "string",
+            "description": "What happens at this outcome"
+          }
+        }
+      }
+    }
   }
   
