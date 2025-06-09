@@ -4,6 +4,14 @@ import pluginReact from "eslint-plugin-react";
 
 export default [
 	{
+		ignores: [
+			"build/**/*",
+			"dist/**/*",
+			"node_modules/**/*",
+			"*.min.js",
+		],
+	},
+	{
 		files: ["**/*.{js,mjs,cjs,jsx}"],
 		languageOptions: {
 			globals: {

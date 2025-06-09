@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
 	Container,
 	Box,
@@ -35,6 +36,12 @@ function TabPanel({ children, value, index, ...other }) {
 		</div>
 	);
 }
+
+TabPanel.propTypes = {
+	children: PropTypes.node,
+	value: PropTypes.number.isRequired,
+	index: PropTypes.number.isRequired,
+};
 
 function App() {
 	const [inputText, setInputText] = useState("");

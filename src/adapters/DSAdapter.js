@@ -1,11 +1,11 @@
 import BaseAdapter from "./BaseAdapter";
 
 class DrawSteelTextAdapter extends BaseAdapter {
-	getName () {
+	getName() {
 		return "Draw Steel Text → JSON Adapter";
 	}
 
-	parse (text) {
+	parse(text) {
 		const lines = text.split(/\r?\n/).map(l => l.trim());
 		let idx = 0;
 
@@ -17,65 +17,116 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		const nameMatch = /^(.+?)\s+LEVEL\s+(\d+)\s*(.*)$/.exec(nameLine);
 		const statblock = {
 			name: nameMatch ? nameMatch[1].trim() : nameLine,
-			level: nameMatch ? parseInt(nameMatch[2], 10) : undefined,
-			tags: nameMatch && nameMatch[3]
+			level: nameMatch ? parseInt(nameMatch[2], 10) : 0,
+			roles: nameMatch && nameMatch[3]
 				? nameMatch[3].split(/\s+/).map(t => t.trim()).filter(Boolean)
 				: [],
 		};
 
-		// 2) Type / Subtype / EV
+		// 2) Type / Subtype / EV - map to ancestry array
 		const typeLine = lines[idx++];
 		const typeMatch = /^([^,]+),\s*([^ ]+)\s+EV\s+(\d+)$/.exec(typeLine);
 		if (typeMatch) {
-			statblock.type = typeMatch[1].trim();
-			statblock.subtype = typeMatch[2].trim();
+			// Map type and subtype to ancestry array as expected by schema
+			statblock.ancestry = [typeMatch[1].trim(), typeMatch[2].trim()];
 			statblock.ev = parseInt(typeMatch[3], 10);
+		} else {
+			statblock.ancestry = [];
+			statblock.ev = 0;
 		}
 
 		// 3) Stamina
 		const staminaLine = lines[idx++];
 		const staminaMatch = /^Stamina\s+(\d+)$/.exec(staminaLine);
-		if (staminaMatch) statblock.stamina = parseInt(staminaMatch[1], 10);
+		statblock.stamina = staminaMatch ? parseInt(staminaMatch[1], 10) : 0;
 
 		// 4) Speed / Size / Stability
 		const speedLine = lines[idx++];
 		const speedMatch = /^Speed\s+(\d+)(?:\s*\(([^)]+)\))?\s+Size\s+(\S+)\s*\/\s*Stability\s+(\d+)$/.exec(speedLine);
 		if (speedMatch) {
 			statblock.speed = parseInt(speedMatch[1], 10);
-			if (speedMatch[2]) statblock.speedModes = speedMatch[2].split(/\s*,\s*/);
 			statblock.size = speedMatch[3];
 			statblock.stability = parseInt(speedMatch[4], 10);
+		} else {
+			statblock.speed = 0;
+			statblock.size = "";
+			statblock.stability = 0;
 		}
 
 		// 5) Free Strike
 		const fsLine = lines[idx++];
 		const fsMatch = /^Free Strike\s+(\d+)$/.exec(fsLine);
-		if (fsMatch) statblock.free_strike = parseInt(fsMatch[1], 10);
+		statblock.free_strike = fsMatch ? parseInt(fsMatch[1], 10) : 0;
 
-		// 6) Stats
+		// 6) Stats - map to individual properties as expected by schema
 		const statsLine = lines[idx++];
 		const statsMatch = /^Might\s*([−-]?\d+)\s+Agility\s*\+?(\d+)\s+Reason\s*\+?(\d+)\s+Intuition\s*\+?(\d+)\s+Presence\s*\+?(\d+)$/.exec(statsLine);
 		if (statsMatch) {
-			statblock.stats = {
-				might: parseInt(statsMatch[1].replace("−", "-"), 10),
-				agility: parseInt(statsMatch[2], 10),
-				reason: parseInt(statsMatch[3], 10),
-				intuition: parseInt(statsMatch[4], 10),
-				presence: parseInt(statsMatch[5], 10),
-			};
+			statblock.might = parseInt(statsMatch[1].replace("−", "-"), 10);
+			statblock.agility = parseInt(statsMatch[2], 10);
+			statblock.reason = parseInt(statsMatch[3], 10);
+			statblock.intuition = parseInt(statsMatch[4], 10);
+			statblock.presence = parseInt(statsMatch[5], 10);
+		} else {
+			statblock.might = 0;
+			statblock.agility = 0;
+			statblock.reason = 0;
+			statblock.intuition = 0;
+			statblock.presence = 0;
 		}
 
-		// 7) Actions & Maneuvers
-		statblock.features = [];
-		statblock.actions = [];
-		statblock.maneuvers = [];
+		// Initialize schema-compliant arrays
+		statblock.immunities = [];
+		statblock.traits = [];
+		statblock.abilities = [];
 
+		// 7) Actions & Maneuvers - convert to abilities array
 		let current = null;
 		const pushCurrent = () => {
 			if (!current) return;
-			if (current.category === "Maneuver") statblock.maneuvers.push(current);
-			else if (/Villain Action/.test(current.category)) statblock.actions.push(current);
-			else statblock.actions.push(current);
+
+			// Convert to ability schema format
+			const ability = {
+				name: current.name,
+				type: this.mapActionTypeToAbilityType(current.category),
+				keywords: current.keywords || [],
+				effects: [],
+			};
+
+			// Add distance and target if present
+			if (current.range) {
+				ability.distance = current.range;
+			}
+			if (current.target) {
+				ability.target = current.target;
+			}
+
+			// Convert roll and outcomes to effects
+			if (current.roll && current.outcomes && current.outcomes.length > 0) {
+				const powerRollEffect = {
+					roll: `${current.roll.dice} + ${current.roll.bonus}`,
+				};
+
+				// Add outcomes as tier results
+				current.outcomes.forEach(outcome => {
+					const key = this.mapOutcomeToTierKey(outcome.symbol, outcome.threshold);
+					powerRollEffect[key] = outcome.description;
+				});
+
+				ability.effects.push(powerRollEffect);
+			}
+
+			// Add effect as string if present
+			if (current.effect) {
+				ability.effects.push(current.effect);
+			}
+
+			// Ensure effects array is not empty (required by schema)
+			if (ability.effects.length === 0) {
+				ability.effects.push("No effect specified");
+			}
+
+			statblock.abilities.push(ability);
 		};
 
 		while (idx < lines.length) {
@@ -139,13 +190,12 @@ class DrawSteelTextAdapter extends BaseAdapter {
 				continue;
 			}
 
-			// End Effect
+			// End Effect - convert to trait
 			const endEff = /^End Effect\s*(.*)$/.exec(line);
 			if (endEff) {
-				statblock.features.push({
+				statblock.traits.push({
 					name: "End Effect",
-					description: endEff[1].trim(),
-					keywords: [],
+					effect: endEff[1].trim() || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
 				});
 				continue;
 			}
@@ -157,7 +207,38 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		return statblock;
 	}
 
-	format (statblock) {
+	/**
+	 * Maps action category to ability type for schema compliance
+	 */
+	mapActionTypeToAbilityType(category) {
+		if (category === "Maneuver") return "Maneuver";
+		if (category === "Main Action") return "Action";
+		if (category === "Free Triggered Action") return "Triggered Action";
+		if (/Villain Action/.test(category)) return "Villain Action";
+		return "Action";
+	}
+
+	/**
+	 * Maps outcome symbols and thresholds to tier keys for power roll effects
+	 */
+	mapOutcomeToTierKey(symbol, threshold) {
+		// Map symbols to approximate tier ranges
+		if (symbol === "✦") {
+			if (threshold.includes("≤11") || threshold.includes("11")) return "11 or lower";
+			return "tier1";
+		}
+		if (symbol === "★") {
+			if (threshold.includes("12–16") || threshold.includes("12-16")) return "12-16";
+			return "tier2";
+		}
+		if (symbol === "✸") {
+			if (threshold.includes("17+") || threshold.includes("17")) return "17+";
+			return "tier3";
+		}
+		return threshold; // fallback to original threshold
+	}
+
+	format(statblock) {
 		return JSON.stringify(statblock, null, 2);
 	}
 }
