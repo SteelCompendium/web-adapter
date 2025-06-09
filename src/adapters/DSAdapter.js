@@ -1,147 +1,165 @@
-import BaseAdapter from './BaseAdapter';
+import BaseAdapter from "./BaseAdapter";
 
-class DSAdapter extends BaseAdapter {
-  getName() {
-    return 'Dungeon Scum';
-  }
+class DrawSteelTextAdapter extends BaseAdapter {
+	getName () {
+		return "Draw Steel Text → JSON Adapter";
+	}
 
-  parse(text) {
-    const lines = text.trim().split('\n').map(l => l.trim());
-    const stat = {
-      name: '',
-      level: 1,
-      type: '',
-      traits: [],
-      stats: {},
-      speed: {},
-      health: {},
-      actions: []
-    };
+	parse (text) {
+		const lines = text.split(/\r?\n/).map(l => l.trim());
+		let idx = 0;
 
-    // Header
-    const header = lines.shift();
-    const match = header.match(/^(.+?) LEVEL (\d+) (.+)$/i);
-    if (match) {
-      stat.name = match[1].trim();
-      stat.level = parseInt(match[2]);
-      stat.type = match[3].trim();
-    }
+		// skip any leading blank lines
+		while (idx < lines.length && !lines[idx]) idx++;
 
-    const statsMap = {
-      Might: 'brawn',
-      Agility: 'agility',
-      Reason: 'smarts',
-      Intuition: 'spirit',
-      Presence: 'presence'
-    };
+		// 1) Header: name, tags
+		const nameLine = lines[idx++];
+		const nameMatch = /^(.+?)\s+LEVEL\s+(\d+)\s*(.*)$/.exec(nameLine);
+		const statblock = {
+			name: nameMatch ? nameMatch[1].trim() : nameLine,
+			level: nameMatch ? parseInt(nameMatch[2], 10) : undefined,
+			tags: nameMatch && nameMatch[3]
+				? nameMatch[3].split(/\s+/).map(t => t.trim()).filter(Boolean)
+				: [],
+		};
 
-    let currentAction = null;
-    let i = 0;
-    while (i < lines.length) {
-      const line = lines[i];
+		// 2) Type / Subtype / EV
+		const typeLine = lines[idx++];
+		const typeMatch = /^([^,]+),\s*([^ ]+)\s+EV\s+(\d+)$/.exec(typeLine);
+		if (typeMatch) {
+			statblock.type = typeMatch[1].trim();
+			statblock.subtype = typeMatch[2].trim();
+			statblock.ev = parseInt(typeMatch[3], 10);
+		}
 
-      if (line.startsWith('Stamina')) {
-        stat.health.wounds = parseInt(line.match(/\d+/)[0]);
-      } else if (line.startsWith('Speed')) {
-        const m = line.match(/Speed (\d+)(?: \((\w+)\))?/);
-        if (m) {
-          stat.speed.pace = parseInt(m[1]);
-          if (m[2]) stat.speed[m[2].toLowerCase()] = parseInt(m[1]);
-        }
-      } else if (line.startsWith('Free Strike')) {
-        stat.traits.push({ name: 'Free Strike', text: line.replace('Free Strike', '').trim() });
-      } else if (/Might|Agility|Reason|Intuition|Presence/.test(line)) {
-        for (const [label, key] of Object.entries(statsMap)) {
-          const m = line.match(new RegExp(`${label} ([−\-+]?\\d+)`));
-          if (m) {
-            stat.stats[key] = parseInt(m[1].replace('−', '-'));
-          }
-        }
-      } else if (line.match(/.+ \((Main Action|Maneuver|Free Triggered Action|Villain Action \d)\)/)) {
-        // Start new action
-        if (currentAction) stat.actions.push(currentAction);
-        const parts = line.split('◆')[0].trim();
-        const [, name, type] = parts.match(/^(.+?) \((.+?)\)$/);
-        currentAction = {
-          name: name.trim(),
-          type: type.toLowerCase(),
-          text: ''
-        };
-      } else if (line.startsWith('End Effect')) {
-        stat.traits.push({
-          name: 'End Effect',
-          text: lines.slice(i + 1).join(' ').trim()
-        });
-        break;
-      } else if (currentAction && line) {
-        currentAction.text += (currentAction.text ? ' ' : '') + line;
-      }
+		// 3) Stamina
+		const staminaLine = lines[idx++];
+		const staminaMatch = /^Stamina\s+(\d+)$/.exec(staminaLine);
+		if (staminaMatch) statblock.stamina = parseInt(staminaMatch[1], 10);
 
-      i++;
-    }
+		// 4) Speed / Size / Stability
+		const speedLine = lines[idx++];
+		const speedMatch = /^Speed\s+(\d+)(?:\s*\(([^)]+)\))?\s+Size\s+(\S+)\s*\/\s*Stability\s+(\d+)$/.exec(speedLine);
+		if (speedMatch) {
+			statblock.speed = parseInt(speedMatch[1], 10);
+			if (speedMatch[2]) statblock.speedModes = speedMatch[2].split(/\s*,\s*/);
+			statblock.size = speedMatch[3];
+			statblock.stability = parseInt(speedMatch[4], 10);
+		}
 
-    if (currentAction) stat.actions.push(currentAction);
+		// 5) Free Strike
+		const fsLine = lines[idx++];
+		const fsMatch = /^Free Strike\s+(\d+)$/.exec(fsLine);
+		if (fsMatch) statblock.free_strike = parseInt(fsMatch[1], 10);
 
-    return stat;
-  }
+		// 6) Stats
+		const statsLine = lines[idx++];
+		const statsMatch = /^Might\s*([−-]?\d+)\s+Agility\s*\+?(\d+)\s+Reason\s*\+?(\d+)\s+Intuition\s*\+?(\d+)\s+Presence\s*\+?(\d+)$/.exec(statsLine);
+		if (statsMatch) {
+			statblock.stats = {
+				might: parseInt(statsMatch[1].replace("−", "-"), 10),
+				agility: parseInt(statsMatch[2], 10),
+				reason: parseInt(statsMatch[3], 10),
+				intuition: parseInt(statsMatch[4], 10),
+				presence: parseInt(statsMatch[5], 10),
+			};
+		}
 
-  format(statblock) {
-    let output = `${statblock.name} LEVEL ${statblock.level} ${statblock.type}\n`;
-    
-    // Add health
-    if (statblock.health?.wounds) {
-      output += `Stamina ${statblock.health.wounds}\n`;
-    }
+		// 7) Actions & Maneuvers
+		statblock.features = [];
+		statblock.actions = [];
+		statblock.maneuvers = [];
 
-    // Add speed
-    if (statblock.speed?.pace) {
-      output += `Speed ${statblock.speed.pace}`;
-      const specialSpeeds = Object.entries(statblock.speed)
-        .filter(([key]) => key !== 'pace')
-        .map(([key, value]) => `(${key})`);
-      if (specialSpeeds.length > 0) {
-        output += ` ${specialSpeeds.join(', ')}`;
-      }
-      output += '\n';
-    }
+		let current = null;
+		const pushCurrent = () => {
+			if (!current) return;
+			if (current.category === "Maneuver") statblock.maneuvers.push(current);
+			else if (/Villain Action/.test(current.category)) statblock.actions.push(current);
+			else statblock.actions.push(current);
+		};
 
-    // Add traits
-    statblock.traits.forEach(trait => {
-      if (trait.name === 'Free Strike') {
-        output += `Free Strike ${trait.text}\n`;
-      }
-    });
+		while (idx < lines.length) {
+			const line = lines[idx++];
 
-    // Add stats
-    const statsOrder = ['brawn', 'agility', 'smarts', 'spirit', 'presence'];
-    const statsLabels = {
-      brawn: 'Might',
-      agility: 'Agility',
-      smarts: 'Reason',
-      spirit: 'Intuition',
-      presence: 'Presence'
-    };
-    
-    const statsLine = statsOrder
-      .map(stat => `${statsLabels[stat]} ${statblock.stats[stat] >= 0 ? '+' : ''}${statblock.stats[stat]}`)
-      .join(' ');
-    output += statsLine + '\n\n';
+			// new action/maneuver header?
+			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)\s+◆\s*(\d+d\d+)\s*\+\s*(\d+)(?:\s*◆\s*(.+))?$/;
+			const m = headerRe.exec(line);
+			if (m) {
+				pushCurrent();
+				current = {
+					name: m[1].trim(),
+					category: m[2],
+					roll: { dice: m[3], bonus: parseInt(m[4], 10) },
+					traits: m[5] ? m[5].split(/\s*,\s*/).map(t => t.trim()) : [],
+					keywords: [],
+					range: "",
+					target: "",
+					outcomes: [],
+					effect: "",
+				};
+				continue;
+			}
 
-    // Add actions
-    statblock.actions.forEach(action => {
-      output += `${action.name} (${action.type})\n`;
-      output += action.text + '\n\n';
-    });
+			if (!current) continue; // skip until we hit first action
 
-    // Add end effect if present
-    const endEffect = statblock.traits.find(t => t.name === 'End Effect');
-    if (endEffect) {
-      output += 'End Effect\n';
-      output += endEffect.text;
-    }
+			// Keywords
+			const kw = /^Keywords\s+(.+)$/.exec(line);
+			if (kw) {
+				current.keywords = kw[1].split(/\s*,\s*/).map(s => s.trim());
+				continue;
+			}
 
-    return output;
-  }
+			// Distance & Target
+			const dt = /^Distance\s+(.+?)\s+Target\s+(.+)$/.exec(line);
+			if (dt) {
+				current.range = dt[1].trim();
+				current.target = dt[2].trim();
+				continue;
+			}
+
+			// Outcomes: ✦ ★ ✸
+			const out = /^([✦★✸])\s*(≤?\d+(?:–\d+)?|\d\+?)\s+(.+)$/.exec(line);
+			if (out) {
+				current.outcomes.push({
+					symbol: out[1],
+					threshold: out[2],
+					description: out[3].trim(),
+				});
+				continue;
+			}
+
+			// Effect (may span multiple lines)
+			const eff = /^Effect\s+(.+)$/.exec(line);
+			if (eff) {
+				current.effect = eff[1].trim();
+				// collect following indented lines
+				while (idx < lines.length && lines[idx].startsWith(" ")) {
+					current.effect += ` ${lines[idx++].trim()}`;
+				}
+				continue;
+			}
+
+			// End Effect
+			const endEff = /^End Effect\s*(.*)$/.exec(line);
+			if (endEff) {
+				statblock.features.push({
+					name: "End Effect",
+					description: endEff[1].trim(),
+					keywords: [],
+				});
+				continue;
+			}
+		}
+
+		// push last one
+		pushCurrent();
+
+		return statblock;
+	}
+
+	format (statblock) {
+		return JSON.stringify(statblock, null, 2);
+	}
 }
 
-export default DSAdapter;
+export default DrawSteelTextAdapter;
