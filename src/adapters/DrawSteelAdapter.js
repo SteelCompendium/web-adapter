@@ -1,8 +1,8 @@
 import BaseAdapter from "./BaseAdapter";
 
-class DrawSteelTextAdapter extends BaseAdapter {
+class DrawSteelAdapter extends BaseAdapter {
 	getName() {
-		return "Draw Steel Text → JSON Adapter";
+		return "Draw Steel";
 	}
 
 	parse(text) {
@@ -393,4 +393,4 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	}
 }
 
-export default DrawSteelTextAdapter;
+export default DrawSteelAdapter;

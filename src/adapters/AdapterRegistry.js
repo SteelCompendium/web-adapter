@@ -1,4 +1,6 @@
-import DSAdapter from "./DSAdapter";
+import DrawSteelAdapter from "./DrawSteelAdapter";
+import JsonAdapter from "./JsonAdapter";
+import YamlAdapter from "./YamlAdapter";
 import validator from "../validation/validator";
 
 class AdapterRegistry {
@@ -8,7 +10,9 @@ class AdapterRegistry {
 	}
 
 	registerDefaultAdapters() {
-		this.registerAdapter(new DSAdapter());
+		this.registerAdapter(new DrawSteelAdapter());
+		this.registerAdapter(new JsonAdapter());
+		this.registerAdapter(new YamlAdapter());
 		// Register more default adapters here
 	}
 
