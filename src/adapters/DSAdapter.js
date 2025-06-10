@@ -59,13 +59,13 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		// 6) Stats
 		const statsLine = lines[idx++];
-		const statsMatch = /^Might\s*([−-]?\d+)\s+Agility\s*\+?(\d+)\s+Reason\s*\+?(\d+)\s+Intuition\s*\+?(\d+)\s+Presence\s*\+?(\d+)$/.exec(statsLine);
+		const statsMatch = /^Might\s*([−-]?\d+)\s+Agility\s*([+-−]?\d+)\s+Reason\s*([+-−]?\d+)\s+Intuition\s*([+-−]?\d+)\s+Presence\s*([+-−]?\d+)$/.exec(statsLine);
 		if (statsMatch) {
 			statblock.might = parseInt(statsMatch[1].replace("−", "-"), 10);
-			statblock.agility = parseInt(statsMatch[2], 10);
-			statblock.reason = parseInt(statsMatch[3], 10);
-			statblock.intuition = parseInt(statsMatch[4], 10);
-			statblock.presence = parseInt(statsMatch[5], 10);
+			statblock.agility = parseInt(statsMatch[2].replace("−", "-"), 10);
+			statblock.reason = parseInt(statsMatch[3].replace("−", "-"), 10);
+			statblock.intuition = parseInt(statsMatch[4].replace("−", "-"), 10);
+			statblock.presence = parseInt(statsMatch[5].replace("−", "-"), 10);
 		} else {
 			statblock.might = 0;
 			statblock.agility = 0;
@@ -109,35 +109,24 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 			// Create effects from roll and outcomes
 			if (current.roll) {
-				const effect = {
-					message: current.effect || "",
-					roll: {
-						dice: current.roll.dice,
-						bonus: current.roll.bonus,
-					},
+				const rollEffect = {
+					roll: `${current.roll.dice} + ${current.roll.bonus}`,
 				};
-
 				if (current.outcomes && current.outcomes.length > 0) {
-					effect.outcomes = current.outcomes.map(o => {
+					current.outcomes.forEach(o => {
 						const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
-						return {
-							[tierKey]: o.description,
-						};
+						rollEffect[tierKey] = o.description;
 					});
 				}
+				ability.effects.push(rollEffect);
+			}
 
-				ability.effects.push(effect);
-			} else if (current.effect) {
-				// Handle Malice effect
-				if (current.effect.match(/^\d+\s+Malice\s+/)) {
-					ability.effects.push({
-						message: current.effect,
-					});
-				} else {
-					ability.effects.push({
-						message: current.effect,
-					});
-				}
+			if (current.effect) {
+				ability.effects.push(current.effect);
+			}
+
+			if (current.sub_effects && current.sub_effects.length > 0) {
+				ability.effects.push(...current.sub_effects);
 			}
 
 			statblock.abilities.push(ability);
@@ -148,22 +137,36 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			if (!line) continue;
 
 			// new action/maneuver header?
-			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)\s+◆\s*(\d+d\d+)\s*\+\s*(\d+)(?:\s*◆\s*(.+))?$/;
+			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
 			const m = headerRe.exec(line);
 			if (m) {
 				pushCurrent();
 				current = {
 					name: m[1].trim(),
 					category: m[2],
-					roll: { dice: m[3], bonus: parseInt(m[4], 10) },
-					cost: m[5] ? m[5].trim() : undefined,
 					keywords: [],
 					range: "",
 					target: "",
 					outcomes: [],
 					effect: "",
 					trigger: "",
+					sub_effects: [],
 				};
+
+				const details = m[3] ? m[3].trim() : "";
+				if (details) {
+					const rollRegex = /(\d+d\d+)\s*\+\s*(\d+)/;
+					const rollMatch = rollRegex.exec(details);
+					if (rollMatch) {
+						current.roll = { dice: rollMatch[1], bonus: parseInt(rollMatch[2], 10) };
+						const remaining = details.replace(rollMatch[0], "").replace("◆", "").trim();
+						if (remaining) {
+							current.cost = remaining;
+						}
+					} else {
+						current.cost = details;
+					}
+				}
 				continue;
 			}
 
@@ -185,7 +188,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			}
 
 			// Outcomes: ✦ ★ ✸
-			const out = /^([✦★✸])\s*(≤?\d+(?:–\d+)?|\d\+?)\s+(.+)$/.exec(line);
+			const out = /^([✦★✸])\s*(≤?\d+(?:–\d+)?|\d+\+?)\s+(.+)$/.exec(line);
 			if (out) {
 				current.outcomes.push({
 					symbol: out[1],
@@ -230,7 +233,14 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			// Malice cost
 			const malice = /^(\d+)\s+Malice\s+(.+)$/.exec(line);
 			if (malice) {
-				current.effect += ` ${malice[1]} Malice ${malice[2]}`;
+				let maliceEffectText = malice[2].trim();
+				while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t"))) {
+					maliceEffectText += ` ${lines[idx++].trim()}`;
+				}
+				current.sub_effects.push({
+					cost: `${malice[1]} Malice`,
+					effect: maliceEffectText,
+				});
 				continue;
 			}
 
