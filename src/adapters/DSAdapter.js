@@ -14,7 +14,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		// 1) Header: name, tags
 		const nameLine = lines[idx++];
-		const nameMatch = /^(.+?)\s+LEVEL\s+(\d+)\s*(.*)$/.exec(nameLine);
+		const nameMatch = /^(.+?)\s+L\s*EVEL\s+(\d+)\s*(.*)$/i.exec(nameLine);
 		const statblock = {
 			name: nameMatch ? nameMatch[1].trim() : nameLine,
 			level: nameMatch ? parseInt(nameMatch[2], 10) : 0,
@@ -27,7 +27,6 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		const typeLine = lines[idx++];
 		const typeMatch = /^([^,]+),\s*([^ ]+)\s+EV\s+(\d+)$/.exec(typeLine);
 		if (typeMatch) {
-			// Map type and subtype to ancestry array as expected by schema
 			statblock.ancestry = [typeMatch[1].trim(), typeMatch[2].trim()];
 			statblock.ev = parseInt(typeMatch[3], 10);
 		} else {
@@ -58,7 +57,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		const fsMatch = /^Free Strike\s+(\d+)$/.exec(fsLine);
 		statblock.free_strike = fsMatch ? parseInt(fsMatch[1], 10) : 0;
 
-		// 6) Stats - map to individual properties as expected by schema
+		// 6) Stats
 		const statsLine = lines[idx++];
 		const statsMatch = /^Might\s*([−-]?\d+)\s+Agility\s*\+?(\d+)\s+Reason\s*\+?(\d+)\s+Intuition\s*\+?(\d+)\s+Presence\s*\+?(\d+)$/.exec(statsLine);
 		if (statsMatch) {
@@ -80,50 +79,65 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		statblock.traits = [];
 		statblock.abilities = [];
 
-		// 7) Actions & Maneuvers - convert to abilities array
+		// 7) Actions & Maneuvers
 		let current = null;
 		const pushCurrent = () => {
 			if (!current) return;
 
-			// Convert to ability schema format
 			const ability = {
 				name: current.name,
 				type: this.mapActionTypeToAbilityType(current.category),
-				keywords: current.keywords || [],
+				keywords: current.keywords,
 				effects: [],
 			};
 
-			// Add distance and target if present
+			if (current.cost) {
+				ability.cost = current.cost;
+			}
+
 			if (current.range) {
 				ability.distance = current.range;
 			}
+
 			if (current.target) {
 				ability.target = current.target;
 			}
 
-			// Convert roll and outcomes to effects
-			if (current.roll && current.outcomes && current.outcomes.length > 0) {
-				const powerRollEffect = {
-					roll: `${current.roll.dice} + ${current.roll.bonus}`,
+			if (current.trigger) {
+				ability.trigger = current.trigger;
+			}
+
+			// Create effects from roll and outcomes
+			if (current.roll) {
+				const effect = {
+					message: current.effect || "",
+					roll: {
+						dice: current.roll.dice,
+						bonus: current.roll.bonus,
+					},
 				};
 
-				// Add outcomes as tier results
-				current.outcomes.forEach(outcome => {
-					const key = this.mapOutcomeToTierKey(outcome.symbol, outcome.threshold);
-					powerRollEffect[key] = outcome.description;
-				});
+				if (current.outcomes && current.outcomes.length > 0) {
+					effect.outcomes = current.outcomes.map(o => {
+						const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
+						return {
+							[tierKey]: o.description,
+						};
+					});
+				}
 
-				ability.effects.push(powerRollEffect);
-			}
-
-			// Add effect as string if present
-			if (current.effect) {
-				ability.effects.push(current.effect);
-			}
-
-			// Ensure effects array is not empty (required by schema)
-			if (ability.effects.length === 0) {
-				ability.effects.push("No effect specified");
+				ability.effects.push(effect);
+			} else if (current.effect) {
+				// Handle Malice effect
+				if (current.effect.match(/^\d+\s+Malice\s+/)) {
+					ability.effects.push({
+						message: current.effect,
+					});
+				} else {
+					ability.effects.push({
+						message: current.effect,
+					});
+				}
 			}
 
 			statblock.abilities.push(ability);
@@ -131,6 +145,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		while (idx < lines.length) {
 			const line = lines[idx++];
+			if (!line) continue;
 
 			// new action/maneuver header?
 			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)\s+◆\s*(\d+d\d+)\s*\+\s*(\d+)(?:\s*◆\s*(.+))?$/;
@@ -141,17 +156,18 @@ class DrawSteelTextAdapter extends BaseAdapter {
 					name: m[1].trim(),
 					category: m[2],
 					roll: { dice: m[3], bonus: parseInt(m[4], 10) },
-					traits: m[5] ? m[5].split(/\s*,\s*/).map(t => t.trim()) : [],
+					cost: m[5] ? m[5].trim() : undefined,
 					keywords: [],
 					range: "",
 					target: "",
 					outcomes: [],
 					effect: "",
+					trigger: "",
 				};
 				continue;
 			}
 
-			if (!current) continue; // skip until we hit first action
+			if (!current) continue;
 
 			// Keywords
 			const kw = /^Keywords\s+(.+)$/.exec(line);
@@ -179,18 +195,29 @@ class DrawSteelTextAdapter extends BaseAdapter {
 				continue;
 			}
 
-			// Effect (may span multiple lines)
+			// Effect
 			const eff = /^Effect\s+(.+)$/.exec(line);
 			if (eff) {
 				current.effect = eff[1].trim();
 				// collect following indented lines
-				while (idx < lines.length && lines[idx].startsWith(" ")) {
+				while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t"))) {
 					current.effect += ` ${lines[idx++].trim()}`;
 				}
 				continue;
 			}
 
-			// End Effect - convert to trait
+			// Trigger
+			const trigger = /^Trigger\s+(.+)$/.exec(line);
+			if (trigger) {
+				current.trigger = trigger[1].trim();
+				// collect following indented lines
+				while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t"))) {
+					current.trigger += ` ${lines[idx++].trim()}`;
+				}
+				continue;
+			}
+
+			// End Effect
 			const endEff = /^End Effect\s*(.*)$/.exec(line);
 			if (endEff) {
 				statblock.traits.push({
@@ -198,6 +225,19 @@ class DrawSteelTextAdapter extends BaseAdapter {
 					effect: endEff[1].trim() || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
 				});
 				continue;
+			}
+
+			// Malice cost
+			const malice = /^(\d+)\s+Malice\s+(.+)$/.exec(line);
+			if (malice) {
+				current.effect += ` ${malice[1]} Malice ${malice[2]}`;
+				continue;
+			}
+
+			// If we hit a blank line, push the current ability
+			if (!line.trim()) {
+				pushCurrent();
+				current = null;
 			}
 		}
 
@@ -211,10 +251,10 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	 * Maps action category to ability type for schema compliance
 	 */
 	mapActionTypeToAbilityType(category) {
-		if (category === "Maneuver") return "Maneuver";
 		if (category === "Main Action") return "Action";
+		if (category === "Maneuver") return "Maneuver";
 		if (category === "Free Triggered Action") return "Triggered Action";
-		if (/Villain Action/.test(category)) return "Villain Action";
+		if (category.startsWith("Villain Action")) return category;
 		return "Action";
 	}
 
@@ -222,20 +262,14 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	 * Maps outcome symbols and thresholds to tier keys for power roll effects
 	 */
 	mapOutcomeToTierKey(symbol, threshold) {
-		// Map symbols to approximate tier ranges
-		if (symbol === "✦") {
-			if (threshold.includes("≤11") || threshold.includes("11")) return "11 or lower";
-			return "tier1";
+		if (threshold.includes("≤")) {
+			return "11 or lower";
+		} else if (threshold.includes("+")) {
+			return "17+";
+		} else if (threshold.includes("–") || threshold.includes("-")) {
+			return threshold;
 		}
-		if (symbol === "★") {
-			if (threshold.includes("12–16") || threshold.includes("12-16")) return "12-16";
-			return "tier2";
-		}
-		if (symbol === "✸") {
-			if (threshold.includes("17+") || threshold.includes("17")) return "17+";
-			return "tier3";
-		}
-		return threshold; // fallback to original threshold
+		return threshold;
 	}
 
 	format(statblock) {
