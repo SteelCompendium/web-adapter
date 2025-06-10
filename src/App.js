@@ -87,14 +87,11 @@ function App() {
 				height: "100vh",
 			}}
 		>
-			<Typography variant="h4" component="h4" align="center" sx={{ py: 2 }}>
-				Statblock Converter & Validator
-			</Typography>
 
 			<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
 				<Tabs value={tabValue} onChange={handleTabChange} aria-label="converter tabs">
-					<Tab label="Format Converter" />
-					<Tab label="JSON Schema Validator" />
+					<Tab label="Draw Steel Statblock Converter" />
+					<Tab label="Statblock Validator" />
 				</Tabs>
 			</Box>
 
@@ -117,11 +114,8 @@ function App() {
 								square
 								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
 							>
-								<Typography variant="h6">
-									Input
-								</Typography>
 								<FormControl fullWidth>
-									<InputLabel>Source Format</InputLabel>
+									<InputLabel>Input Format</InputLabel>
 									<Select
 										value={sourceFormat}
 										label="Source Format"
@@ -161,11 +155,8 @@ function App() {
 								square
 								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
 							>
-								<Typography variant="h6">
-									Output
-								</Typography>
 								<FormControl fullWidth>
-									<InputLabel>Target Format</InputLabel>
+									<InputLabel>Output Format</InputLabel>
 									<Select
 										value={targetFormat}
 										label="Target Format"
