@@ -73,13 +73,13 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		// 6) Stats
 		const statsLine = lines[idx++];
-		const statsMatch = /^Might\s*([−-]?\d+)\s+Agility\s*([+-−]?\d+)\s+Reason\s*([+-−]?\d+)\s+Intuition\s*([+-−]?\d+)\s+Presence\s*([+-−]?\d+)$/.exec(statsLine);
+		const statsMatch = /^Might\s*([+-−]?\d+)\s+Agility\s*([+-−]?\d+)\s+Reason\s*([+-−]?\d+)\s+Intuition\s*([+-−]?\d+)\s+Presence\s*([+-−]?\d+)$/.exec(statsLine);
 		if (statsMatch) {
-			statblock.might = parseInt(statsMatch[1].replace("−", "-"), 10);
-			statblock.agility = parseInt(statsMatch[2].replace("−", "-"), 10);
-			statblock.reason = parseInt(statsMatch[3].replace("−", "-"), 10);
-			statblock.intuition = parseInt(statsMatch[4].replace("−", "-"), 10);
-			statblock.presence = parseInt(statsMatch[5].replace("−", "-"), 10);
+			statblock.might = parseInt(statsMatch[1].replace("−", "-").replace("+", ""), 10);
+			statblock.agility = parseInt(statsMatch[2].replace("−", "-").replace("+", ""), 10);
+			statblock.reason = parseInt(statsMatch[3].replace("−", "-").replace("+", ""), 10);
+			statblock.intuition = parseInt(statsMatch[4].replace("−", "-").replace("+", ""), 10);
+			statblock.presence = parseInt(statsMatch[5].replace("−", "-").replace("+", ""), 10);
 		} else {
 			statblock.might = 0;
 			statblock.agility = 0;
