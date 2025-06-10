@@ -19,7 +19,7 @@ import {
 import adapterRegistry from "./adapters/AdapterRegistry";
 import JSONValidator from "./components/JSONValidator";
 
-function TabPanel ({ children, value, index, ...other }) {
+function TabPanel({ children, value, index, ...other }) {
 	return (
 		<div
 			role="tabpanel"
@@ -27,9 +27,10 @@ function TabPanel ({ children, value, index, ...other }) {
 			id={`simple-tabpanel-${index}`}
 			aria-labelledby={`simple-tab-${index}`}
 			{...other}
+			style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
 		>
 			{value === index && (
-				<Box sx={{ p: 3 }}>
+				<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
 					{children}
 				</Box>
 			)}
@@ -43,7 +44,7 @@ TabPanel.propTypes = {
 	index: PropTypes.number.isRequired,
 };
 
-function App () {
+function App() {
 	const [inputText, setInputText] = useState("");
 	const [outputText, setOutputText] = useState("");
 	const [sourceFormat, setSourceFormat] = useState("");
@@ -77,106 +78,149 @@ function App () {
 	};
 
 	return (
-		<Container maxWidth="lg" sx={{ py: 4 }}>
-			<Typography variant="h3" component="h1" gutterBottom align="center">
+		<Container
+			maxWidth="false"
+			sx={{
+				py: 0,
+				px: 0,
+				display: "flex",
+				flexDirection: "column",
+				height: "100vh",
+			}}
+		>
+			<Typography variant="h4" component="h4" gutterBottom align="center">
 				Statblock Converter & Validator
 			</Typography>
 
-			<Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+			<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
 				<Tabs value={tabValue} onChange={handleTabChange} aria-label="converter tabs">
 					<Tab label="Format Converter" />
 					<Tab label="JSON Schema Validator" />
 				</Tabs>
 			</Box>
 
-			<TabPanel value={tabValue} index={0}>
-				{error && (
-					<Alert severity="error" sx={{ mb: 2 }}>
-						{error}
-					</Alert>
-				)}
+			<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+				<TabPanel value={tabValue} index={0}>
+					{error && (
+						<Alert severity="error" sx={{ mb: 2 }}>
+							{error}
+						</Alert>
+					)}
 
-				<Grid container spacing={3}>
-					<Grid item xs={12} md={6}>
-						<Paper sx={{ p: 2 }}>
-							<Typography variant="h6" gutterBottom>
-								Input
-							</Typography>
-							<FormControl fullWidth sx={{ mb: 2 }}>
-								<InputLabel>Source Format</InputLabel>
-								<Select
-									value={sourceFormat}
-									label="Source Format"
-									onChange={(e) => setSourceFormat(e.target.value)}
-								>
-									{availableFormats.map((format) => (
-										<MenuItem key={format} value={format}>
-											{format}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-							<TextField
-								fullWidth
-								multiline
-								rows={10}
-								value={inputText}
-								onChange={(e) => setInputText(e.target.value)}
-								placeholder="Paste your statblock here..."
-								variant="outlined"
-							/>
-						</Paper>
+					<Grid container spacing={3} sx={{ flexGrow: 1 }}>
+						<Grid
+							item
+							xs={12}
+							md={6}
+							sx={{ display: "flex", flexDirection: "column" }}
+						>
+							<Paper sx={{ p: 2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+								<Typography variant="h6" gutterBottom>
+									Input
+								</Typography>
+								<FormControl fullWidth sx={{ mb: 2 }}>
+									<InputLabel>Source Format</InputLabel>
+									<Select
+										value={sourceFormat}
+										label="Source Format"
+										onChange={(e) => setSourceFormat(e.target.value)}
+									>
+										{availableFormats.map((format) => (
+											<MenuItem key={format} value={format}>
+												{format}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+								<Box sx={{
+									overflowY: "auto", border: "1px solid #ccc", borderRadius: 1,
+									"& .MuiTextField-root": {
+										"& .MuiOutlinedInput-root": {
+											"& > fieldset": {
+												border: "none",
+											},
+										},
+									},
+								}}>
+									<TextField
+										sx={{ width: "100%" }}
+										multiline
+										minRows={20}
+										maxRows={50}
+										value={inputText}
+										onChange={(e) => setInputText(e.target.value)}
+										placeholder="Paste your statblock here..."
+									/>
+								</Box>
+							</Paper>
+						</Grid>
+
+						<Grid
+							item
+							xs={12}
+							md={6}
+							sx={{ display: "flex", flexDirection: "column" }}
+						>
+							<Paper sx={{ p: 2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+								<Typography variant="h6" gutterBottom>
+									Output
+								</Typography>
+								<FormControl fullWidth sx={{ mb: 2 }}>
+									<InputLabel>Target Format</InputLabel>
+									<Select
+										value={targetFormat}
+										label="Target Format"
+										onChange={(e) => setTargetFormat(e.target.value)}
+									>
+										{availableFormats.map((format) => (
+											<MenuItem key={format} value={format}>
+												{format}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+								<Box sx={{
+									overflowY: "auto", border: "1px solid #ccc", borderRadius: 1,
+									"& .MuiTextField-root": {
+										"& .MuiOutlinedInput-root": {
+											"& > fieldset": {
+												border: "none",
+											},
+										},
+									},
+								}}>
+									<TextField
+										sx={{ width: "100%" }}
+										multiline
+										minRows={20}
+										maxRows={50}
+										value={outputText}
+										InputProps={{
+											readOnly: true,
+										}}
+										placeholder="Converted statblock will appear here..."
+									/>
+								</Box>
+							</Paper>
+						</Grid>
 					</Grid>
 
-					<Grid item xs={12} md={6}>
-						<Paper sx={{ p: 2 }}>
-							<Typography variant="h6" gutterBottom>
-								Output
-							</Typography>
-							<FormControl fullWidth sx={{ mb: 2 }}>
-								<InputLabel>Target Format</InputLabel>
-								<Select
-									value={targetFormat}
-									label="Target Format"
-									onChange={(e) => setTargetFormat(e.target.value)}
-								>
-									{availableFormats.map((format) => (
-										<MenuItem key={format} value={format}>
-											{format}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-							<TextField
-								fullWidth
-								multiline
-								rows={10}
-								value={outputText}
-								InputProps={{
-									readOnly: true,
-								}}
-								placeholder="Converted statblock will appear here..."
-								variant="outlined"
-							/>
-						</Paper>
-					</Grid>
-				</Grid>
+					<Box sx={{ mt: 3, textAlign: "center" }}>
+						<Button
+							variant="contained"
+							size="large"
+							onClick={handleConvert}
+							disabled={!inputText || !sourceFormat || !targetFormat}
+						>
+							Convert
+						</Button>
+					</Box>
+				</TabPanel>
 
-				<Box sx={{ mt: 3, textAlign: "center" }}>
-					<Button
-						variant="contained"
-						size="large"
-						onClick={handleConvert}
-						disabled={!inputText || !sourceFormat || !targetFormat}
-					>
-						Convert
-					</Button>
-				</Box>
-			</TabPanel>
-
-			<TabPanel value={tabValue} index={1}>
-				<JSONValidator onValidData={handleValidData} />
-			</TabPanel>
+				<TabPanel value={tabValue} index={1}>
+					<JSONValidator onValidData={handleValidData} />
+				</TabPanel>
+			</Box>
 		</Container>
 	);
 }

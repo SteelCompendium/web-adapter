@@ -15,6 +15,7 @@ import {
 	ListItem,
 	ListItemText,
 	Divider,
+	Grid,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -91,122 +92,164 @@ const JSONValidator = ({ onValidData }) => {
 	};
 
 	return (
-		<Paper sx={{ p: 3 }}>
-			<Typography variant="h6" gutterBottom>
-				JSON Schema Validator
-			</Typography>
-
-			<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-				Validate your JSON against the Draw Steel statblock schema. Use the sample button to load a valid example.
-			</Typography>
-
-			<Box sx={{ mb: 2 }}>
-				<TextField
-					fullWidth
-					multiline
-					rows={12}
-					value={jsonInput}
-					onChange={(e) => setJsonInput(e.target.value)}
-					placeholder="Paste your JSON here to validate against the statblock schema..."
-					variant="outlined"
-					label="JSON Input"
-				/>
-			</Box>
-
-			<Box sx={{ mb: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
-				<Button
-					variant="contained"
-					onClick={handleValidate}
-					disabled={isValidating || !jsonInput.trim()}
-					startIcon={getValidationIcon()}
-					color={getValidationColor()}
-				>
-					{isValidating ? "Validating..." : "Validate JSON"}
-				</Button>
-				<Button
-					variant="outlined"
-					onClick={handleLoadSample}
-					startIcon={<FileDownloadIcon />}
-				>
-					Load Sample
-				</Button>
-				<Button
-					variant="outlined"
-					onClick={handleClear}
-					disabled={!jsonInput && !validationResult}
-				>
-					Clear
-				</Button>
-			</Box>
-
-			{validationResult && (
-				<Box sx={{ mt: 2 }}>
-					{validationResult.valid ? (
-						<Alert severity="success" icon={<CheckCircleIcon />}>
-							<Typography variant="subtitle1">
-								✅ JSON is valid!
-							</Typography>
-							<Typography variant="body2">
-								The JSON conforms to the Draw Steel statblock schema.
-							</Typography>
-						</Alert>
-					) : (
-						<Alert severity="error" icon={<ErrorIcon />}>
-							<Typography variant="subtitle1">
-								❌ JSON validation failed
-							</Typography>
-							<Typography variant="body2" sx={{ mb: 1 }}>
-								Found {validationResult.errors.length} error(s):
-							</Typography>
-
-							<Accordion>
-								<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-									<Typography variant="body2">
-										View Validation Errors ({validationResult.errors.length})
+		<Grid container spacing={3} sx={{ flexGrow: 1 }}>
+			<Grid
+				item
+				xs={12}
+				md={6}
+				sx={{ display: "flex", flexDirection: "column" }}
+			>
+				<Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+					<Typography variant="h6" gutterBottom>
+						JSON Input
+					</Typography>
+					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+						Validate your JSON against the Draw Steel statblock schema.
+					</Typography>
+					<Box sx={{
+						overflowY: "auto", border: "1px solid #ccc", borderRadius: 1,
+						"& .MuiTextField-root": {
+							"& .MuiOutlinedInput-root": {
+								"& > fieldset": {
+									border: "none",
+								},
+							},
+						},
+					}}>
+						<TextField
+							sx={{ width: "100%" }}
+							multiline
+							minRows={20}
+							maxRows={50}
+							value={jsonInput}
+							onChange={(e) => setJsonInput(e.target.value)}
+							placeholder="Paste your JSON here to validate against the statblock schema..."
+						/>
+					</Box>
+					<Box sx={{ mt: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
+						<Button
+							variant="contained"
+							onClick={handleValidate}
+							disabled={isValidating || !jsonInput.trim()}
+							startIcon={getValidationIcon()}
+							color={getValidationColor()}
+						>
+							{isValidating ? "Validating..." : "Validate JSON"}
+						</Button>
+						<Button
+							variant="outlined"
+							onClick={handleLoadSample}
+							startIcon={<FileDownloadIcon />}
+						>
+							Load Sample
+						</Button>
+						<Button
+							variant="outlined"
+							onClick={handleClear}
+							disabled={!jsonInput && !validationResult}
+						>
+							Clear
+						</Button>
+					</Box>
+				</Paper>
+			</Grid>
+			<Grid
+				item
+				xs={12}
+				md={6}
+				sx={{ display: "flex", flexDirection: "column" }}
+			>
+				<Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+					<Typography variant="h6" gutterBottom>
+						Validation Results
+					</Typography>
+					{validationResult ? (
+						<Box sx={{ overflowY: "auto" }}>
+							{validationResult.valid ? (
+								<Alert severity="success" icon={<CheckCircleIcon />}>
+									<Typography variant="subtitle1">
+										✅ JSON is valid!
 									</Typography>
-								</AccordionSummary>
-								<AccordionDetails>
-									<List dense>
-										{validationResult.errors.map((error, index) => (
-											<React.Fragment key={index}>
-												<ListItem sx={{ pl: 0, alignItems: "flex-start" }}>
-													<ListItemText
-														primary={
-															<Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-																<Chip
-																	label={`Error ${index + 1}`}
-																	size="small"
-																	color="error"
-																	variant="outlined"
-																/>
-																<Typography variant="body2" component="span" fontWeight="medium">
-																	{formatErrorPath(error)}
-																</Typography>
-															</Box>
-														}
-														secondary={
-															<Typography variant="body2" color="text.secondary">
-																{error.message}
-																{error.allowedValues && (
-																	<Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-																		Allowed values: {error.allowedValues.join(", ")}
+									<Typography variant="body2">
+										The JSON conforms to the Draw Steel statblock schema.
+									</Typography>
+								</Alert>
+							) : (
+								<Alert severity="error" icon={<ErrorIcon />}>
+									<Typography variant="subtitle1">
+										❌ JSON validation failed
+									</Typography>
+									<Typography variant="body2" sx={{ mb: 1 }}>
+										Found {validationResult.errors.length} error(s):
+									</Typography>
+
+									<Accordion>
+										<AccordionSummary expandIcon={<ExpandMoreIcon />}>
+											<Typography variant="body2">
+												View Validation Errors ({validationResult.errors.length})
+											</Typography>
+										</AccordionSummary>
+										<AccordionDetails>
+											<List dense>
+												{validationResult.errors.map((error, index) => (
+													<React.Fragment key={index}>
+														<ListItem sx={{ pl: 0, alignItems: "flex-start" }}>
+															<ListItemText
+																primary={
+																	<Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+																		<Chip
+																			label={`Error ${index + 1}`}
+																			size="small"
+																			color="error"
+																			variant="outlined"
+																		/>
+																		<Typography variant="body2" component="span" fontWeight="medium">
+																			{formatErrorPath(error)}
+																		</Typography>
+																	</Box>
+																}
+																secondary={
+																	<Typography variant="body2" color="text.secondary">
+																		{error.message}
+																		{error.allowedValues && (
+																			<Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
+																				Allowed values: {error.allowedValues.join(", ")}
+																			</Typography>
+																		)}
 																	</Typography>
-																)}
-															</Typography>
-														}
-													/>
-												</ListItem>
-												{index < validationResult.errors.length - 1 && <Divider />}
-											</React.Fragment>
-										))}
-									</List>
-								</AccordionDetails>
-							</Accordion>
-						</Alert>
+																}
+															/>
+														</ListItem>
+														{index < validationResult.errors.length - 1 && <Divider />}
+													</React.Fragment>
+												))}
+											</List>
+										</AccordionDetails>
+									</Accordion>
+								</Alert>
+							)}
+						</Box>
+					) : (
+						<Box
+							sx={{
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								textAlign: "center",
+								p: 2,
+								border: "1px dashed #ccc",
+								borderRadius: 1,
+								backgroundColor: "#f9f9f9",
+							}}
+						>
+							<Typography variant="body1" color="text.secondary">
+								Validation results will appear here.
+							</Typography>
+						</Box>
 					)}
-				</Box>
-			)}
-		</Paper>
+				</Paper>
+			</Grid>
+		</Grid>
 	);
 };
 
