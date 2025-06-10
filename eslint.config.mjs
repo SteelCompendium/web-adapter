@@ -32,7 +32,7 @@ export default [
 			"indent": ["error", "tab"],
 			"comma-dangle": ["error", "always-multiline"],
 			"no-trailing-spaces": "error",
-			"space-before-function-paren": ["error", "always"],
+			"space-before-function-paren": "off",
 		},
 	},
 	{

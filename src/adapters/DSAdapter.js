@@ -1,11 +1,11 @@
 import BaseAdapter from "./BaseAdapter";
 
 class DrawSteelTextAdapter extends BaseAdapter {
-	getName () {
+	getName() {
 		return "Draw Steel Text → JSON Adapter";
 	}
 
-	parse (text) {
+	parse(text) {
 		const lines = text.split(/\r?\n/).map(l => l.trim());
 		let idx = 0;
 
@@ -89,6 +89,15 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			if (/^Trigger\s+/.test(line)) return true;
 			if (/^End Effect/.test(line)) return true;
 			if (/^\d+\s+Malice/.test(line)) return true;
+			// check for trait names (PascalCase or ALL CAPS)
+			if (/^([A-Z][a-z]+)+$/.test(line) || /^[A-Z\s]+$/.test(line)) {
+				// but not if it's a multi-word line that looks like an effect
+				if (line.includes(" ")) {
+					const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)/.exec(line);
+					return !!m;
+				}
+				return true;
+			}
 			return false;
 		};
 
@@ -287,20 +296,40 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			}
 
 			if (line.startsWith("Crafty")) {
+				const effect = lines[idx] ? lines[idx++].trim() : "The assassin doesn't provoke opportunity attacks by moving.";
 				statblock.traits.push({
 					name: "Crafty",
-					effect: "The assassin doesn’t provoke opportunity attacks by moving.",
+					effect: effect,
 				});
-				idx++; // consume effect line
 				continue;
 			}
 
 			if (line.startsWith("Slip Away")) {
+				const effect = lines[idx] ? lines[idx++].trim() : "The assassin can take the Hide maneuver even while observed.";
 				statblock.traits.push({
 					name: "Slip Away",
-					effect: "The assassin can take the Hide maneuver even while observed.",
+					effect: effect,
 				});
-				idx++; // consume effect line
+				continue;
+			}
+
+			if (!current && !isNewToken(line)) {
+				// Potential trait name
+				const traitName = line.trim();
+				let effect = "";
+				// The next line must be the effect
+				if (idx < lines.length && !isNewToken(lines[idx])) {
+					effect = lines[idx++].trim();
+					// And any following lines that are not new tokens are part of the effect
+					while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t") || !isNewToken(lines[idx]))) {
+						effect += " " + lines[idx++].trim();
+					}
+
+					statblock.traits.push({
+						name: traitName,
+						effect: effect,
+					});
+				}
 				continue;
 			}
 
@@ -320,7 +349,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	/**
 	 * Maps action category to ability type for schema compliance
 	 */
-	mapActionTypeToAbilityType (category) {
+	mapActionTypeToAbilityType(category) {
 		if (category === "Main Action") return "Action";
 		if (category === "Maneuver") return "Maneuver";
 		if (category === "Free Triggered Action") return "Triggered Action";
@@ -331,7 +360,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	/**
 	 * Maps outcome symbols and thresholds to tier keys for power roll effects
 	 */
-	mapOutcomeToTierKey (symbol, threshold) {
+	mapOutcomeToTierKey(symbol, threshold) {
 		if (threshold.includes("≤")) {
 			return "11 or lower";
 		} else if (threshold.includes("+")) {
@@ -342,7 +371,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		return threshold;
 	}
 
-	format (statblock) {
+	format(statblock) {
 		return JSON.stringify(statblock, null, 2);
 	}
 }
