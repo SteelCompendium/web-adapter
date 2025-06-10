@@ -1,11 +1,11 @@
 import BaseAdapter from "./BaseAdapter";
 
 class DrawSteelTextAdapter extends BaseAdapter {
-	getName() {
+	getName () {
 		return "Draw Steel Text → JSON Adapter";
 	}
 
-	parse(text) {
+	parse (text) {
 		const lines = text.split(/\r?\n/).map(l => l.trim());
 		let idx = 0;
 
@@ -250,7 +250,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	/**
 	 * Maps action category to ability type for schema compliance
 	 */
-	mapActionTypeToAbilityType(category) {
+	mapActionTypeToAbilityType (category) {
 		if (category === "Main Action") return "Action";
 		if (category === "Maneuver") return "Maneuver";
 		if (category === "Free Triggered Action") return "Triggered Action";
@@ -261,7 +261,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	/**
 	 * Maps outcome symbols and thresholds to tier keys for power roll effects
 	 */
-	mapOutcomeToTierKey(symbol, threshold) {
+	mapOutcomeToTierKey (symbol, threshold) {
 		if (threshold.includes("≤")) {
 			return "11 or lower";
 		} else if (threshold.includes("+")) {
@@ -272,7 +272,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		return threshold;
 	}
 
-	format(statblock) {
+	format (statblock) {
 		return JSON.stringify(statblock, null, 2);
 	}
 }

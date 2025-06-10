@@ -3,22 +3,22 @@ import DSAdapter from "./DSAdapter";
 import validator from "../validation/validator";
 
 class AdapterRegistry {
-	constructor() {
+	constructor () {
 		this.adapters = new Map();
 		this.registerDefaultAdapters();
 	}
 
-	registerDefaultAdapters() {
+	registerDefaultAdapters () {
 		this.registerAdapter(new DnD5EAdapter());
 		this.registerAdapter(new DSAdapter());
 		// Register more default adapters here
 	}
 
-	registerAdapter(adapter) {
+	registerAdapter (adapter) {
 		this.adapters.set(adapter.getName(), adapter);
 	}
 
-	getAdapter(name) {
+	getAdapter (name) {
 		const adapter = this.adapters.get(name);
 		if (!adapter) {
 			throw new Error(`No adapter found for format: ${name}`);
@@ -26,11 +26,11 @@ class AdapterRegistry {
 		return adapter;
 	}
 
-	getAvailableFormats() {
+	getAvailableFormats () {
 		return Array.from(this.adapters.keys());
 	}
 
-	convert(text, sourceFormat, targetFormat) {
+	convert (text, sourceFormat, targetFormat) {
 		const sourceAdapter = this.getAdapter(sourceFormat);
 		const targetAdapter = this.getAdapter(targetFormat);
 
@@ -65,7 +65,7 @@ class AdapterRegistry {
 	 * @param {string} text - The text to check
 	 * @returns {boolean} - True if the text appears to be JSON
 	 */
-	isJSONFormat(text) {
+	isJSONFormat (text) {
 		if (typeof text !== "string") return false;
 		const trimmed = text.trim();
 		return (trimmed.startsWith("{") && trimmed.endsWith("}"))

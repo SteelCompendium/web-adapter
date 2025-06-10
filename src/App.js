@@ -19,7 +19,7 @@ import {
 import adapterRegistry from "./adapters/AdapterRegistry";
 import JSONValidator from "./components/JSONValidator";
 
-function TabPanel({ children, value, index, ...other }) {
+function TabPanel ({ children, value, index, ...other }) {
 	return (
 		<div
 			role="tabpanel"
@@ -43,7 +43,7 @@ TabPanel.propTypes = {
 	index: PropTypes.number.isRequired,
 };
 
-function App() {
+function App () {
 	const [inputText, setInputText] = useState("");
 	const [outputText, setOutputText] = useState("");
 	const [sourceFormat, setSourceFormat] = useState("");
