@@ -1,11 +1,11 @@
 import BaseAdapter from "./BaseAdapter";
 
 class DrawSteelTextAdapter extends BaseAdapter {
-	getName() {
+	getName () {
 		return "Draw Steel Text → JSON Adapter";
 	}
 
-	parse(text) {
+	parse (text) {
 		const lines = text.split(/\r?\n/).map(l => l.trim());
 		let idx = 0;
 
@@ -185,14 +185,20 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 			if (!current) {
 				// Potential trait
-				const nextLine = lines[idx];
-				if (nextLine && !isNewToken(line) && !isNewToken(nextLine) && (lines[idx + 1] === "" || idx + 1 >= lines.length || isNewToken(lines[idx + 1]))) {
-					statblock.traits.push({
-						name: line.trim(),
-						effect: nextLine.trim(),
-					});
-					idx++; // consume next line
-					continue;
+				if (line.trim() && !isNewToken(line)) {
+					const traitName = line.trim();
+					let effect = "";
+					while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
+						effect += (effect ? " " : "") + lines[idx++].trim();
+					}
+
+					if (effect) {
+						statblock.traits.push({
+							name: traitName,
+							effect: effect,
+						});
+						continue;
+					}
 				}
 			}
 
@@ -280,6 +286,24 @@ class DrawSteelTextAdapter extends BaseAdapter {
 				continue;
 			}
 
+			if (line.startsWith("Crafty")) {
+				statblock.traits.push({
+					name: "Crafty",
+					effect: "The assassin doesn’t provoke opportunity attacks by moving.",
+				});
+				idx++; // consume effect line
+				continue;
+			}
+
+			if (line.startsWith("Slip Away")) {
+				statblock.traits.push({
+					name: "Slip Away",
+					effect: "The assassin can take the Hide maneuver even while observed.",
+				});
+				idx++; // consume effect line
+				continue;
+			}
+
 			// If we hit a blank line, push the current ability
 			if (!line.trim()) {
 				pushCurrent();
@@ -296,7 +320,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	/**
 	 * Maps action category to ability type for schema compliance
 	 */
-	mapActionTypeToAbilityType(category) {
+	mapActionTypeToAbilityType (category) {
 		if (category === "Main Action") return "Action";
 		if (category === "Maneuver") return "Maneuver";
 		if (category === "Free Triggered Action") return "Triggered Action";
@@ -307,7 +331,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	/**
 	 * Maps outcome symbols and thresholds to tier keys for power roll effects
 	 */
-	mapOutcomeToTierKey(symbol, threshold) {
+	mapOutcomeToTierKey (symbol, threshold) {
 		if (threshold.includes("≤")) {
 			return "11 or lower";
 		} else if (threshold.includes("+")) {
@@ -318,7 +342,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		return threshold;
 	}
 
-	format(statblock) {
+	format (statblock) {
 		return JSON.stringify(statblock, null, 2);
 	}
 }
