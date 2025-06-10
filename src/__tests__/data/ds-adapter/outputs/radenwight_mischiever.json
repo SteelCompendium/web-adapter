@@ -14,8 +14,8 @@
     "speed": "7 (climb)",
     "size": "1S",
     "stability": 0,
-    "free_strike": 2,
     "with_captain": "Strike damage +1",
+    "free_strike": 2,
     "might": -1,
     "agility": 2,
     "reason": 0,
@@ -52,10 +52,12 @@
                 "Melee",
                 "Weapon"
             ],
+            "effects": [
+                "The mischiever makes a free strike against the target."
+            ],
             "distance": "Melee 1",
             "target": "One creature",
-            "trigger": "An ally deals damage to the target.",
-            "effect": "The mischiever makes a free strike against the target."
+            "trigger": "An ally deals damage to the target."
         }
     ]
 }

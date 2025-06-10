@@ -9,9 +9,9 @@
     "Goblin",
     "Humanoid"
   ],
-  "ev": 3,
+  "ev": "3",
   "stamina": 15,
-  "speed": 6,
+  "speed": "6 (climb)",
   "size": "1S",
   "stability": 0,
   "free_strike": 2,
