@@ -25,10 +25,13 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		// 2) Type / Subtype / EV - map to ancestry array
 		const typeLine = lines[idx++];
-		const typeMatch = /^([^,]+),\s*([^ ]+)\s+EV\s+(\d+)$/.exec(typeLine);
+		const typeMatch = /^([^,]+)(?:,\s*([^,]+))?\s+EV\s+(.+)$/.exec(typeLine);
 		if (typeMatch) {
-			statblock.ancestry = [typeMatch[1].trim(), typeMatch[2].trim()];
-			statblock.ev = parseInt(typeMatch[3], 10);
+			statblock.ancestry = [typeMatch[1].trim()];
+			if (typeMatch[2]) {
+				statblock.ancestry.push(typeMatch[2].trim());
+			}
+			statblock.ev = typeMatch[3].trim();
 		} else {
 			statblock.ancestry = [];
 			statblock.ev = 0;
@@ -43,7 +46,13 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		const speedLine = lines[idx++];
 		const speedMatch = /^Speed\s+(\d+)(?:\s*\(([^)]+)\))?\s+Size\s+(\S+)\s*\/\s*Stability\s+(\d+)$/.exec(speedLine);
 		if (speedMatch) {
-			statblock.speed = parseInt(speedMatch[1], 10);
+			const baseSpeed = speedMatch[1];
+			const speedExtra = speedMatch[2];
+			if (speedExtra) {
+				statblock.speed = `${baseSpeed} (${speedExtra})`;
+			} else {
+				statblock.speed = parseInt(baseSpeed, 10);
+			}
 			statblock.size = speedMatch[3];
 			statblock.stability = parseInt(speedMatch[4], 10);
 		} else {
@@ -54,8 +63,13 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		// 5) Free Strike
 		const fsLine = lines[idx++];
-		const fsMatch = /^Free Strike\s+(\d+)$/.exec(fsLine);
+		const fsMatch = /Free Strike\s+(\d+)/.exec(fsLine);
 		statblock.free_strike = fsMatch ? parseInt(fsMatch[1], 10) : 0;
+
+		const captainMatch = /With Captain\s+(.+?)(?=\s+Free Strike|$)/.exec(fsLine);
+		if (captainMatch) {
+			statblock.with_captain = captainMatch[1].trim();
+		}
 
 		// 6) Stats
 		const statsLine = lines[idx++];
@@ -81,19 +95,19 @@ class DrawSteelTextAdapter extends BaseAdapter {
 
 		const isNewToken = (line) => {
 			if (!line.trim()) return true; // blank line
-			if (/^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)/.test(line)) return true;
+			if (/^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.test(line)) return true;
 			if (/^Keywords\s+/.test(line)) return true;
 			if (/^Distance\s+/.test(line)) return true;
 			if (/^[✦★✸]/.test(line)) return true;
 			if (/^Effect\s+/.test(line)) return true;
 			if (/^Trigger\s+/.test(line)) return true;
 			if (/^End Effect/.test(line)) return true;
-			if (/^\d+\s+Malice/.test(line)) return true;
+			if (/^\d+\+?\s+Malice/.test(line)) return true;
 			// check for trait names (PascalCase or ALL CAPS)
 			if (/^([A-Z][a-z]+)+$/.test(line) || /^[A-Z\s]+$/.test(line)) {
 				// but not if it's a multi-word line that looks like an effect
 				if (line.includes(" ")) {
-					const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)/.exec(line);
+					const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
 					return !!m;
 				}
 				return true;
@@ -159,7 +173,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			if (!line) continue;
 
 			// new action/maneuver header?
-			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
+			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
 			const m = headerRe.exec(line);
 			if (m) {
 				pushCurrent();
@@ -239,21 +253,37 @@ class DrawSteelTextAdapter extends BaseAdapter {
 				continue;
 			}
 
-			// Effect
-			const eff = /^Effect\s+(.+)$/.exec(line);
-			if (eff) {
-				current.effect = eff[1].trim();
-				// collect following indented lines
-				while (idx < lines.length && !isNewToken(lines[idx])) {
-					current.effect += ` ${lines[idx++].trim()}`;
+			// Malice cost effect
+			const malice = /^(\d+\+?\s+Malice)\s+(.+)$/.exec(line);
+			if (malice) {
+				let effectText = malice[2].trim();
+				// Greedily consume subsequent lines that are not new tokens
+				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
+					effectText += " " + lines[idx++].trim();
 				}
+				current.sub_effects.push({
+					cost: malice[1],
+					effect: effectText,
+				});
+				continue;
+			}
+
+			// Effect
+			const ef = /^Effect\s+(.+)$/.exec(line);
+			if (ef) {
+				let effectText = ef[1].trim();
+				// Greedily consume subsequent lines that are not new tokens
+				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
+					effectText += " " + lines[idx++].trim();
+				}
+				current.effect = effectText;
 				continue;
 			}
 
 			// Trigger
-			const trigger = /^Trigger\s+(.+)$/.exec(line);
-			if (trigger) {
-				current.trigger = trigger[1].trim();
+			const tr = /^Trigger\s+(.+)$/.exec(line);
+			if (tr) {
+				current.trigger = tr[1].trim();
 				// collect following indented lines
 				while (idx < lines.length && !isNewToken(lines[idx])) {
 					current.trigger += ` ${lines[idx++].trim()}`;
@@ -277,20 +307,6 @@ class DrawSteelTextAdapter extends BaseAdapter {
 				statblock.traits.push({
 					name: "End Effect",
 					effect: effectText || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
-				});
-				continue;
-			}
-
-			// Malice cost
-			const malice = /^(\d+)\s+Malice\s+(.+)$/.exec(line);
-			if (malice) {
-				let maliceEffectText = malice[2].trim();
-				while (idx < lines.length && !isNewToken(lines[idx])) {
-					maliceEffectText += ` ${lines[idx++].trim()}`;
-				}
-				current.sub_effects.push({
-					cost: `${malice[1]} Malice`,
-					effect: maliceEffectText,
 				});
 				continue;
 			}
@@ -352,6 +368,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 	mapActionTypeToAbilityType(category) {
 		if (category === "Main Action") return "Action";
 		if (category === "Maneuver") return "Maneuver";
+		if (category === "Triggered Action") return "Triggered Action";
 		if (category === "Free Triggered Action") return "Triggered Action";
 		if (category.startsWith("Villain Action")) return category;
 		return "Action";
