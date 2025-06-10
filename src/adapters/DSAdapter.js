@@ -79,6 +79,19 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		statblock.traits = [];
 		statblock.abilities = [];
 
+		const isNewToken = (line) => {
+			if (!line.trim()) return true; // blank line
+			if (/^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Villain Action\s*\d+)\)/.test(line)) return true;
+			if (/^Keywords\s+/.test(line)) return true;
+			if (/^Distance\s+/.test(line)) return true;
+			if (/^[✦★✸]/.test(line)) return true;
+			if (/^Effect\s+/.test(line)) return true;
+			if (/^Trigger\s+/.test(line)) return true;
+			if (/^End Effect/.test(line)) return true;
+			if (/^\d+\s+Malice/.test(line)) return true;
+			return false;
+		};
+
 		// 7) Actions & Maneuvers
 		let current = null;
 		const pushCurrent = () => {
@@ -203,7 +216,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			if (eff) {
 				current.effect = eff[1].trim();
 				// collect following indented lines
-				while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t"))) {
+				while (idx < lines.length && !isNewToken(lines[idx])) {
 					current.effect += ` ${lines[idx++].trim()}`;
 				}
 				continue;
@@ -214,7 +227,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			if (trigger) {
 				current.trigger = trigger[1].trim();
 				// collect following indented lines
-				while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t"))) {
+				while (idx < lines.length && !isNewToken(lines[idx])) {
 					current.trigger += ` ${lines[idx++].trim()}`;
 				}
 				continue;
@@ -223,9 +236,19 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			// End Effect
 			const endEff = /^End Effect\s*(.*)$/.exec(line);
 			if (endEff) {
+				pushCurrent();
+				current = null;
+
+				let effectText = endEff[1].trim();
+				while (idx < lines.length && !isNewToken(lines[idx])) {
+					const nextLine = lines[idx++].trim();
+					if (nextLine) {
+						effectText += (effectText ? " " : "") + nextLine;
+					}
+				}
 				statblock.traits.push({
 					name: "End Effect",
-					effect: endEff[1].trim() || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
+					effect: effectText || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
 				});
 				continue;
 			}
@@ -234,7 +257,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 			const malice = /^(\d+)\s+Malice\s+(.+)$/.exec(line);
 			if (malice) {
 				let maliceEffectText = malice[2].trim();
-				while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t"))) {
+				while (idx < lines.length && !isNewToken(lines[idx])) {
 					maliceEffectText += ` ${lines[idx++].trim()}`;
 				}
 				current.sub_effects.push({
@@ -277,7 +300,7 @@ class DrawSteelTextAdapter extends BaseAdapter {
 		} else if (threshold.includes("+")) {
 			return "17+";
 		} else if (threshold.includes("–") || threshold.includes("-")) {
-			return threshold;
+			return threshold.replace("–", "-");
 		}
 		return threshold;
 	}
