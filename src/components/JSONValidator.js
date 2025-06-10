@@ -92,29 +92,26 @@ const JSONValidator = ({ onValidData }) => {
 	};
 
 	return (
-		<Grid container spacing={3} sx={{ flexGrow: 1 }}>
+		<Grid container sx={{ flexGrow: 1 }}>
 			<Grid
 				item
 				xs={12}
 				md={6}
 				sx={{ display: "flex", flexDirection: "column" }}
 			>
-				<Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-					<Typography variant="h6" gutterBottom>
+				<Paper
+					square
+					sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
+				>
+					<Typography variant="h6">
 						JSON Input
 					</Typography>
-					<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+					<Typography variant="body2" color="text.secondary">
 						Validate your JSON against the Draw Steel statblock schema.
 					</Typography>
 					<Box sx={{
-						overflowY: "auto", border: "1px solid #ccc", borderRadius: 1,
-						"& .MuiTextField-root": {
-							"& .MuiOutlinedInput-root": {
-								"& > fieldset": {
-									border: "none",
-								},
-							},
-						},
+						overflowY: "auto",
+						flexGrow: 1,
 					}}>
 						<TextField
 							sx={{ width: "100%" }}
@@ -126,7 +123,7 @@ const JSONValidator = ({ onValidData }) => {
 							placeholder="Paste your JSON here to validate against the statblock schema..."
 						/>
 					</Box>
-					<Box sx={{ mt: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
+					<Box sx={{ p: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
 						<Button
 							variant="contained"
 							onClick={handleValidate}
@@ -159,14 +156,17 @@ const JSONValidator = ({ onValidData }) => {
 				md={6}
 				sx={{ display: "flex", flexDirection: "column" }}
 			>
-				<Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-					<Typography variant="h6" gutterBottom>
+				<Paper
+					square
+					sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
+				>
+					<Typography variant="h6">
 						Validation Results
 					</Typography>
 					{validationResult ? (
-						<Box sx={{ overflowY: "auto" }}>
+						<Box sx={{ overflowY: "auto", flexGrow: 1 }}>
 							{validationResult.valid ? (
-								<Alert severity="success" icon={<CheckCircleIcon />}>
+								<Alert severity="success" icon={<CheckCircleIcon />} square>
 									<Typography variant="subtitle1">
 										✅ JSON is valid!
 									</Typography>
@@ -175,7 +175,7 @@ const JSONValidator = ({ onValidData }) => {
 									</Typography>
 								</Alert>
 							) : (
-								<Alert severity="error" icon={<ErrorIcon />}>
+								<Alert severity="error" icon={<ErrorIcon />} square>
 									<Typography variant="subtitle1">
 										❌ JSON validation failed
 									</Typography>
@@ -232,13 +232,11 @@ const JSONValidator = ({ onValidData }) => {
 					) : (
 						<Box
 							sx={{
+								flexGrow: 1,
 								display: "flex",
 								alignItems: "center",
 								justifyContent: "center",
 								textAlign: "center",
-								p: 2,
-								border: "1px dashed #ccc",
-								borderRadius: 1,
 								backgroundColor: "#f9f9f9",
 							}}
 						>

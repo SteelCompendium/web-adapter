@@ -79,16 +79,15 @@ function App() {
 
 	return (
 		<Container
-			maxWidth="false"
+			maxWidth={false}
+			disableGutters
 			sx={{
-				py: 0,
-				px: 0,
 				display: "flex",
 				flexDirection: "column",
 				height: "100vh",
 			}}
 		>
-			<Typography variant="h4" component="h4" gutterBottom align="center">
+			<Typography variant="h4" component="h4" align="center" sx={{ py: 2 }}>
 				Statblock Converter & Validator
 			</Typography>
 
@@ -102,23 +101,26 @@ function App() {
 			<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
 				<TabPanel value={tabValue} index={0}>
 					{error && (
-						<Alert severity="error" sx={{ mb: 2 }}>
+						<Alert severity="error" square>
 							{error}
 						</Alert>
 					)}
 
-					<Grid container spacing={3} sx={{ flexGrow: 1 }}>
+					<Grid container sx={{ flexGrow: 1 }}>
 						<Grid
 							item
 							xs={12}
 							md={6}
 							sx={{ display: "flex", flexDirection: "column" }}
 						>
-							<Paper sx={{ p: 2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
-								<Typography variant="h6" gutterBottom>
+							<Paper
+								square
+								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
+							>
+								<Typography variant="h6">
 									Input
 								</Typography>
-								<FormControl fullWidth sx={{ mb: 2 }}>
+								<FormControl fullWidth>
 									<InputLabel>Source Format</InputLabel>
 									<Select
 										value={sourceFormat}
@@ -133,17 +135,11 @@ function App() {
 									</Select>
 								</FormControl>
 								<Box sx={{
-									overflowY: "auto", border: "1px solid #ccc", borderRadius: 1,
-									"& .MuiTextField-root": {
-										"& .MuiOutlinedInput-root": {
-											"& > fieldset": {
-												border: "none",
-											},
-										},
-									},
+									overflowY: "auto",
+									flexGrow: 1,
 								}}>
 									<TextField
-										sx={{ width: "100%" }}
+										sx={{ width: "100%", paddingTop: "1rem" }}
 										multiline
 										minRows={20}
 										maxRows={50}
@@ -161,11 +157,14 @@ function App() {
 							md={6}
 							sx={{ display: "flex", flexDirection: "column" }}
 						>
-							<Paper sx={{ p: 2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
-								<Typography variant="h6" gutterBottom>
+							<Paper
+								square
+								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
+							>
+								<Typography variant="h6">
 									Output
 								</Typography>
-								<FormControl fullWidth sx={{ mb: 2 }}>
+								<FormControl fullWidth>
 									<InputLabel>Target Format</InputLabel>
 									<Select
 										value={targetFormat}
@@ -180,17 +179,11 @@ function App() {
 									</Select>
 								</FormControl>
 								<Box sx={{
-									overflowY: "auto", border: "1px solid #ccc", borderRadius: 1,
-									"& .MuiTextField-root": {
-										"& .MuiOutlinedInput-root": {
-											"& > fieldset": {
-												border: "none",
-											},
-										},
-									},
+									overflowY: "auto",
+									flexGrow: 1,
 								}}>
 									<TextField
-										sx={{ width: "100%" }}
+										sx={{ width: "100%", paddingTop: "1rem" }}
 										multiline
 										minRows={20}
 										maxRows={50}
@@ -205,7 +198,7 @@ function App() {
 						</Grid>
 					</Grid>
 
-					<Box sx={{ mt: 3, textAlign: "center" }}>
+					<Box sx={{ p: 1, textAlign: "center" }}>
 						<Button
 							variant="contained"
 							size="large"
