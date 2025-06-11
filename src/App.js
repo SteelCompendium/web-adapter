@@ -5,7 +5,6 @@ import {
 	Box,
 	TextField,
 	Button,
-	Typography,
 	Paper,
 	Grid,
 	Select,
@@ -19,22 +18,27 @@ import {
 import adapterRegistry from "./adapters/AdapterRegistry";
 import JSONValidator from "./components/JSONValidator";
 
-function TabPanel({ children, value, index, ...other }) {
+function TabPanel({ children, value, index, sx, ...other }) {
 	return (
-		<div
+		<Box
 			role="tabpanel"
 			hidden={value !== index}
 			id={`simple-tabpanel-${index}`}
 			aria-labelledby={`simple-tab-${index}`}
 			{...other}
-			style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+			sx={{
+				flexGrow: 1,
+				display: "flex",
+				flexDirection: "column",
+				...sx,
+			}}
 		>
 			{value === index && (
-				<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+				<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
 					{children}
 				</Box>
 			)}
-		</div>
+		</Box>
 	);
 }
 
@@ -42,6 +46,7 @@ TabPanel.propTypes = {
 	children: PropTypes.node,
 	value: PropTypes.number.isRequired,
 	index: PropTypes.number.isRequired,
+	sx: PropTypes.object,
 };
 
 function App() {
@@ -96,24 +101,16 @@ function App() {
 			</Box>
 
 			<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-				<TabPanel value={tabValue} index={0}>
+				<TabPanel value={tabValue} index={0} sx={{ height: "100%" }}>
 					{error && (
 						<Alert severity="error" square>
 							{error}
 						</Alert>
 					)}
 
-					<Grid container sx={{ flexGrow: 1 }}>
-						<Grid
-							item
-							xs={12}
-							md={6}
-							sx={{ display: "flex", flexDirection: "column" }}
-						>
-							<Paper
-								square
-								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
-							>
+					<Box sx={{ p: 2 }}>
+						<Grid container spacing={2} alignItems="center">
+							<Grid item xs={12} md>
 								<FormControl fullWidth>
 									<InputLabel>Input Format</InputLabel>
 									<Select
@@ -128,10 +125,52 @@ function App() {
 										))}
 									</Select>
 								</FormControl>
+							</Grid>
+							<Grid item xs={12} md="auto">
+								<Box sx={{ textAlign: "center", width: "100%" }}>
+									<Button
+										variant="contained"
+										size="large"
+										onClick={handleConvert}
+										disabled={!inputText || !sourceFormat || !targetFormat}
+									>
+										Convert
+									</Button>
+								</Box>
+							</Grid>
+							<Grid item xs={12} md>
+								<FormControl fullWidth>
+									<InputLabel>Output Format</InputLabel>
+									<Select
+										value={targetFormat}
+										label="Target Format"
+										onChange={(e) => setTargetFormat(e.target.value)}
+									>
+										{availableFormats.map((format) => (
+											<MenuItem key={format} value={format}>
+												{format}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+							</Grid>
+						</Grid>
+					</Box>
+
+					<Grid container sx={{ flexGrow: 1 }}>
+						<Grid
+							item
+							xs={12}
+							md={6}
+							sx={{ display: "flex", flexDirection: "column" }}
+						>
+							<Paper
+								square
+								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
+							>
 								<Box sx={{
 									flexGrow: 1,
 									position: "relative",
-									mt: 2,
 								}}>
 									<TextField
 										sx={{
@@ -151,7 +190,6 @@ function App() {
 											},
 										}}
 										multiline
-										rows={1}
 										value={inputText}
 										onChange={(e) => setInputText(e.target.value)}
 										placeholder="Paste your statblock here..."
@@ -170,24 +208,9 @@ function App() {
 								square
 								sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 1 }}
 							>
-								<FormControl fullWidth>
-									<InputLabel>Output Format</InputLabel>
-									<Select
-										value={targetFormat}
-										label="Target Format"
-										onChange={(e) => setTargetFormat(e.target.value)}
-									>
-										{availableFormats.map((format) => (
-											<MenuItem key={format} value={format}>
-												{format}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
 								<Box sx={{
 									flexGrow: 1,
 									position: "relative",
-									mt: 2,
 								}}>
 									<TextField
 										sx={{
@@ -207,7 +230,6 @@ function App() {
 											},
 										}}
 										multiline
-										rows={1}
 										value={outputText}
 										InputProps={{
 											readOnly: true,
@@ -218,17 +240,6 @@ function App() {
 							</Paper>
 						</Grid>
 					</Grid>
-
-					<Box sx={{ p: 1, textAlign: "center" }}>
-						<Button
-							variant="contained"
-							size="large"
-							onClick={handleConvert}
-							disabled={!inputText || !sourceFormat || !targetFormat}
-						>
-							Convert
-						</Button>
-					</Box>
 				</TabPanel>
 
 				<TabPanel value={tabValue} index={1}>
