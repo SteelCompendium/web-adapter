@@ -129,14 +129,29 @@ function App() {
 									</Select>
 								</FormControl>
 								<Box sx={{
-									overflowY: "auto",
 									flexGrow: 1,
+									position: "relative",
+									mt: 2,
 								}}>
 									<TextField
-										sx={{ width: "100%", paddingTop: "1rem" }}
+										sx={{
+											position: "absolute",
+											top: 0,
+											left: 0,
+											width: "100%",
+											height: "100%",
+											"& .MuiInputBase-root": {
+												height: "100%",
+												alignItems: "flex-start",
+											},
+											"& textarea": {
+												height: "100% !important",
+												overflowY: "auto !important",
+												boxSizing: "border-box",
+											},
+										}}
 										multiline
-										minRows={20}
-										maxRows={50}
+										rows={1}
 										value={inputText}
 										onChange={(e) => setInputText(e.target.value)}
 										placeholder="Paste your statblock here..."
@@ -170,14 +185,29 @@ function App() {
 									</Select>
 								</FormControl>
 								<Box sx={{
-									overflowY: "auto",
 									flexGrow: 1,
+									position: "relative",
+									mt: 2,
 								}}>
 									<TextField
-										sx={{ width: "100%", paddingTop: "1rem" }}
+										sx={{
+											position: "absolute",
+											top: 0,
+											left: 0,
+											width: "100%",
+											height: "100%",
+											"& .MuiInputBase-root": {
+												height: "100%",
+												alignItems: "flex-start",
+											},
+											"& textarea": {
+												height: "100% !important",
+												overflowY: "auto !important",
+												boxSizing: "border-box",
+											},
+										}}
 										multiline
-										minRows={20}
-										maxRows={50}
+										rows={1}
 										value={outputText}
 										InputProps={{
 											readOnly: true,
