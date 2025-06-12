@@ -146,7 +146,7 @@ function App() {
 										label="Target Format"
 										onChange={(e) => setTargetFormat(e.target.value)}
 									>
-										{availableFormats.map((format) => (
+										{adapterRegistry.getAvailableFormats(true).map((format) => (
 											<MenuItem key={format} value={format}>
 												{format}
 											</MenuItem>

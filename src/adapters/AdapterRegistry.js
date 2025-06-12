@@ -28,8 +28,12 @@ class AdapterRegistry {
 		return adapter;
 	}
 
-	getAvailableFormats() {
-		return Array.from(this.adapters.keys());
+	getAvailableFormats(isOutput = false) {
+		const formats = Array.from(this.adapters.keys());
+		if (isOutput) {
+			return formats.filter(format => format !== "Draw Steel");
+		}
+		return formats;
 	}
 
 	convert(text, sourceFormat, targetFormat) {
