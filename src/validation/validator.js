@@ -1,10 +1,10 @@
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import statblockSchema from "../statblock.schema.json";
-import abilitySchema from "../ability.schema.json";
+import statblockSchema from "../schema/statblock.schema.json";
+import abilitySchema from "../schema/ability.schema.json";
 
 class JSONValidator {
-	constructor () {
+	constructor() {
 		this.ajv = new Ajv({ allErrors: true, strict: false });
 		addFormats(this.ajv);
 
@@ -16,11 +16,11 @@ class JSONValidator {
 	}
 
 	/**
-     * Validates a JSON object against the statblock schema
-     * @param {Object} data - The JSON data to validate
-     * @returns {Object} - { valid: boolean, errors: Array }
-     */
-	validate (data) {
+	 * Validates a JSON object against the statblock schema
+	 * @param {Object} data - The JSON data to validate
+	 * @returns {Object} - { valid: boolean, errors: Array }
+	 */
+	validate(data) {
 		try {
 			const valid = this.validateStatblock(data);
 			return {
@@ -36,11 +36,11 @@ class JSONValidator {
 	}
 
 	/**
-     * Validates a JSON string against the statblock schema
-     * @param {string} jsonString - The JSON string to validate
-     * @returns {Object} - { valid: boolean, errors: Array, data: Object|null }
-     */
-	validateJSON (jsonString) {
+	 * Validates a JSON string against the statblock schema
+	 * @param {string} jsonString - The JSON string to validate
+	 * @returns {Object} - { valid: boolean, errors: Array, data: Object|null }
+	 */
+	validateJSON(jsonString) {
 		try {
 			const data = JSON.parse(jsonString);
 			const validation = this.validate(data);
@@ -58,11 +58,11 @@ class JSONValidator {
 	}
 
 	/**
-     * Formats validation errors for display
-     * @param {Array} errors - Array of AJV validation errors
-     * @returns {Array} - Array of formatted error messages
-     */
-	formatErrors (errors) {
+	 * Formats validation errors for display
+	 * @param {Array} errors - Array of AJV validation errors
+	 * @returns {Array} - Array of formatted error messages
+	 */
+	formatErrors(errors) {
 		return errors.map(error => {
 			const path = error.instancePath || "root";
 			const message = error.message || "Unknown error";

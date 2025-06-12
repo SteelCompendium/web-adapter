@@ -259,7 +259,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				let effectText = malice[2].trim();
 				// Greedily consume subsequent lines that are not new tokens
 				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
-					effectText += " " + lines[idx++].trim();
+					effectText += ` ${lines[idx++].trim()}`;
 				}
 				current.sub_effects.push({
 					cost: malice[1],
@@ -274,7 +274,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				let effectText = ef[1].trim();
 				// Greedily consume subsequent lines that are not new tokens
 				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
-					effectText += " " + lines[idx++].trim();
+					effectText += ` ${lines[idx++].trim()}`;
 				}
 				current.effect = effectText;
 				continue;
@@ -338,7 +338,7 @@ class DrawSteelAdapter extends BaseAdapter {
 					effect = lines[idx++].trim();
 					// And any following lines that are not new tokens are part of the effect
 					while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t") || !isNewToken(lines[idx]))) {
-						effect += " " + lines[idx++].trim();
+						effect += ` ${lines[idx++].trim()}`;
 					}
 
 					statblock.traits.push({
