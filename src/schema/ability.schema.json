@@ -18,26 +18,26 @@
     },
     "cost": {
       "type": "string",
-      "description": "Cost to use the ability (e.g., \"5 Essence\")"
+      "description": "Cost to use the ability (e.g., \"5 Essence\", \"Signature\", \"2 Malice\")"
     },
     "keywords": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Comma-separated keywords (e.g., [\"Magic\",\"Earth\"])"
+      "description": "Keywords associated with the ability (e.g., [\"Magic\",\"Earth\",\"Melee\"])"
     },
     "type": {
       "type": "string",
-      "description": "Ability type (e.g., \"Action\", \"Maneuver\")"
+      "description": "Ability type (e.g., \"Action\", \"Maneuver\", \"Triggered Action\", \"Villain Action 1\")"
     },
     "distance": {
       "type": "string",
-      "description": "Distance or area (e.g., \"Ranged 5\", \"2 burst\")"
+      "description": "Distance or area (e.g., \"Ranged 5\", \"2 burst\", \"Melee 1\")"
     },
     "target": {
       "type": "string",
-      "description": "Who or what is targeted (e.g., \"All enemies\")"
+      "description": "Who or what is targeted (e.g., \"All enemies\", \"One creature\", \"Self\")"
     },
     "trigger": {
       "type": "string",
@@ -82,7 +82,7 @@
       "properties": {
         "roll": {
           "type": "string",
-          "description": "Power Roll expression (e.g., \"Power Roll + Reason\")"
+          "description": "Power Roll expression (e.g., \"2d10 + 3\")"
         }
       },
       "additionalProperties": {

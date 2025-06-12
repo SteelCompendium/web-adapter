@@ -34,12 +34,9 @@
       "default": []
     },
     "ev": {
-      "type": [
-        "integer",
-        "string"
-      ],
+      "type": "string",
       "description": "Encounter Value (EV) of the creature.",
-      "default": 0
+      "default": "0"
     },
     "stamina": {
       "type": "integer",
@@ -56,7 +53,7 @@
     },
     "speed": {
       "type": "string",
-      "description": "Movement speed of the creature.",
+      "description": "Movement speed of the creature, may include parenthetical modifiers (e.g., '5 (climb)').",
       "default": ""
     },
     "size": {
