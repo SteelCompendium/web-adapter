@@ -108,14 +108,14 @@ class DrawSteelAdapter extends BaseAdapter {
 			if (/^Trigger\s+/.test(line)) return true;
 			if (/^End Effect/.test(line)) return true;
 			if (/^\d+\+?\s+Malice/.test(line)) return true;
-			// check for trait names (PascalCase or ALL CAPS)
-			if (/^([A-Z][a-z]+)+$/.test(line) || /^[A-Z\s]+$/.test(line)) {
+			// check for trait names (PascalCase, ALL CAPS, or Title Case)
+			const words = line.split(" ");
+			const isTitleCased = words.every(w => w.length > 0 && /^[A-Z]/.test(w));
+			if (isTitleCased) {
 				// but not if it's a multi-word line that looks like an effect
-				if (line.includes(" ")) {
-					const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
-					return !!m;
-				}
-				return true;
+				if (words.length > 4) return false;
+				const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
+				return !m;
 			}
 			return false;
 		};
@@ -171,6 +171,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			}
 
 			statblock.abilities.push(ability);
+			current = null;
 		};
 
 		while (idx < lines.length) {
@@ -226,6 +227,22 @@ class DrawSteelAdapter extends BaseAdapter {
 					});
 					continue;
 				}
+			}
+
+			// if we have a current action, but we encounter a new token that is NOT a recognized action token,
+			// then we should finalize the current action and re-process the line as a new token (e.g. trait)
+			if (current && isNewToken(line)
+				&& !/^Keywords\s+/.test(line)
+				&& !/^Distance\s+/.test(line)
+				&& !/^[✦★✸]/.test(line)
+				&& !/^Effect\s+/.test(line)
+				&& !/^Trigger\s+/.test(line)
+				&& !/^End Effect/.test(line)
+				&& !/^\d+\+?\s+Malice/.test(line)
+			) {
+				pushCurrent();
+				idx--; // re-process this line
+				continue;
 			}
 
 			// Keywords
@@ -312,8 +329,6 @@ class DrawSteelAdapter extends BaseAdapter {
 				continue;
 			}
 
-			
-
 			if (!current && !isNewToken(line)) {
 				// Potential trait name
 				const traitName = line.trim();
@@ -341,7 +356,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			}
 		}
 
-		// push last one
+		// push the last action
 		pushCurrent();
 
 		return statblock;
