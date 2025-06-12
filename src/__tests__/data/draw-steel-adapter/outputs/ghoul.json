@@ -10,7 +10,7 @@
     ],
     "ev": "3",
     "stamina": 15,
-    "speed": 7,
+    "speed": "7",
     "size": "1M",
     "stability": 0,
     "free_strike": 1,
@@ -26,11 +26,11 @@
     "traits": [
         {
             "name": "Hunger",
-            "description": "If the ghoul charges, their speed increases by 2 until the end of their turn."
+            "effect": "If the ghoul charges, their speed increases by 2 until the end of their turn."
         },
         {
             "name": "Arise",
-            "description": "The first time the ghoul is reduced to Stamina 0 by damage that isn’t fire damage or holy damage and their body isn’t destroyed, they regain 1 Stamina and fall prone."
+            "effect": "The first time the ghoul is reduced to Stamina 0 by damage that isn't fire damage or holy damage and their body isn't destroyed, they regain 1 Stamina and fall prone."
         }
     ],
     "abilities": [

@@ -39,8 +39,13 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 3) Stamina
 		const staminaLine = lines[idx++];
-		const staminaMatch = /^Stamina\s+(\d+)$/.exec(staminaLine);
+		const staminaMatch = /^Stamina\s+(\d+)/.exec(staminaLine);
 		statblock.stamina = staminaMatch ? parseInt(staminaMatch[1], 10) : 0;
+
+		const immunityMatch = /Immunity\s+(.+)$/i.exec(staminaLine);
+		if (immunityMatch) {
+			statblock.immunities = immunityMatch[1].split(/\s*,\s*/).map(s => s.trim());
+		}
 
 		// 4) Speed / Size / Stability
 		const speedLine = lines[idx++];
@@ -51,7 +56,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			if (speedExtra) {
 				statblock.speed = `${baseSpeed} (${speedExtra})`;
 			} else {
-				statblock.speed = parseInt(baseSpeed, 10);
+				statblock.speed = baseSpeed;
 			}
 			statblock.size = speedMatch[3];
 			statblock.stability = parseInt(speedMatch[4], 10);
@@ -89,7 +94,7 @@ class DrawSteelAdapter extends BaseAdapter {
 		}
 
 		// Initialize schema-compliant arrays
-		statblock.immunities = [];
+		if (!statblock.immunities) statblock.immunities = [];
 		statblock.traits = [];
 		statblock.abilities = [];
 
@@ -169,11 +174,11 @@ class DrawSteelAdapter extends BaseAdapter {
 		};
 
 		while (idx < lines.length) {
-			const line = lines[idx++];
+			const line = lines[idx++].trim();
 			if (!line) continue;
 
 			// new action/maneuver header?
-			const headerRe = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
+			const headerRe = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
 			const m = headerRe.exec(line);
 			if (m) {
 				pushCurrent();
@@ -208,24 +213,20 @@ class DrawSteelAdapter extends BaseAdapter {
 
 			if (!current) {
 				// Potential trait
-				if (line.trim() && !isNewToken(line)) {
-					const traitName = line.trim();
-					let effect = "";
-					while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
-						effect += (effect ? " " : "") + lines[idx++].trim();
-					}
+				const traitName = line.trim();
+				let effect = "";
+				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
+					effect += (effect ? " " : "") + lines[idx++].trim();
+				}
 
-					if (effect) {
-						statblock.traits.push({
-							name: traitName,
-							effect: effect,
-						});
-						continue;
-					}
+				if (effect) {
+					statblock.traits.push({
+						name: traitName,
+						effect: effect,
+					});
+					continue;
 				}
 			}
-
-			if (!current) continue;
 
 			// Keywords
 			const kw = /^Keywords\s+(.+)$/.exec(line);
@@ -311,23 +312,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				continue;
 			}
 
-			if (line.startsWith("Crafty")) {
-				const effect = lines[idx] ? lines[idx++].trim() : "The assassin doesn't provoke opportunity attacks by moving.";
-				statblock.traits.push({
-					name: "Crafty",
-					effect: effect,
-				});
-				continue;
-			}
-
-			if (line.startsWith("Slip Away")) {
-				const effect = lines[idx] ? lines[idx++].trim() : "The assassin can take the Hide maneuver even while observed.";
-				statblock.traits.push({
-					name: "Slip Away",
-					effect: effect,
-				});
-				continue;
-			}
+			
 
 			if (!current && !isNewToken(line)) {
 				// Potential trait name
@@ -367,6 +352,7 @@ class DrawSteelAdapter extends BaseAdapter {
 	 */
 	mapActionTypeToAbilityType(category) {
 		if (category === "Main Action") return "Action";
+		if (category === "Action") return "Action";
 		if (category === "Maneuver") return "Maneuver";
 		if (category === "Triggered Action") return "Triggered Action";
 		if (category === "Free Triggered Action") return "Triggered Action";
