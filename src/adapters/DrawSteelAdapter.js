@@ -129,7 +129,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				name: current.name,
 				type: this.mapActionTypeToAbilityType(current.category),
 				keywords: current.keywords,
-				effects: [],
+				effects: current.effects || [],
 			};
 
 			if (current.cost) {
@@ -146,28 +146,6 @@ class DrawSteelAdapter extends BaseAdapter {
 
 			if (current.trigger) {
 				ability.trigger = current.trigger;
-			}
-
-			// Create effects from roll and outcomes
-			if (current.roll) {
-				const rollEffect = {
-					roll: `${current.roll.dice} + ${current.roll.bonus}`,
-				};
-				if (current.outcomes && current.outcomes.length > 0) {
-					current.outcomes.forEach(o => {
-						const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
-						rollEffect[tierKey] = o.description;
-					});
-				}
-				ability.effects.push(rollEffect);
-			}
-
-			if (current.effect) {
-				ability.effects.push(current.effect);
-			}
-
-			if (current.sub_effects && current.sub_effects.length > 0) {
-				ability.effects.push(...current.sub_effects);
 			}
 
 			statblock.abilities.push(ability);
@@ -190,7 +168,7 @@ class DrawSteelAdapter extends BaseAdapter {
 					range: "",
 					target: "",
 					outcomes: [],
-					effect: "",
+					effects: [],
 					trigger: "",
 					sub_effects: [],
 				};
@@ -268,6 +246,22 @@ class DrawSteelAdapter extends BaseAdapter {
 					threshold: out[2],
 					description: out[3].trim(),
 				});
+				// If next line is not another outcome, push roll effect
+				if (idx >= lines.length || !/^([✦★✸])\s*/.test(lines[idx])) {
+					if (current.roll) {
+						const rollEffect = {
+							roll: `${current.roll.dice} + ${current.roll.bonus}`,
+						};
+						if (current.outcomes && current.outcomes.length > 0) {
+							current.outcomes.forEach(o => {
+								const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
+								rollEffect[tierKey] = o.description;
+							});
+						}
+						current.effects.push(rollEffect);
+						current.outcomes = [];
+					}
+				}
 				continue;
 			}
 
@@ -275,11 +269,10 @@ class DrawSteelAdapter extends BaseAdapter {
 			const malice = /^(\d+\+?\s+Malice)\s+(.+)$/.exec(line);
 			if (malice) {
 				let effectText = malice[2].trim();
-				// Greedily consume subsequent lines that are not new tokens
 				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
 					effectText += ` ${lines[idx++].trim()}`;
 				}
-				current.sub_effects.push({
+				current.effects.push({
 					cost: malice[1],
 					effect: effectText,
 				});
@@ -290,11 +283,10 @@ class DrawSteelAdapter extends BaseAdapter {
 			const ef = /^Effect\s+(.+)$/.exec(line);
 			if (ef) {
 				let effectText = ef[1].trim();
-				// Greedily consume subsequent lines that are not new tokens
 				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
 					effectText += ` ${lines[idx++].trim()}`;
 				}
-				current.effect = effectText;
+				current.effects.push(effectText);
 				continue;
 			}
 
