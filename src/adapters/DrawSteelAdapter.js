@@ -248,7 +248,25 @@ class DrawSteelAdapter extends BaseAdapter {
 				});
 				// If next line is not another outcome, push roll effect
 				if (idx >= lines.length || !/^([✦★✸])\s*/.test(lines[idx])) {
-					if (current.roll) {
+					// Check if we have a roll from the header or from a previous effect
+					if (!current.roll && current.effects.length > 0) {
+						const lastEffect = current.effects[current.effects.length - 1];
+						if (typeof lastEffect === "string" && lastEffect.includes("test")) {
+							// Create roll effect with the test description
+							const rollEffect = {
+								roll: lastEffect,
+							};
+							if (current.outcomes && current.outcomes.length > 0) {
+								current.outcomes.forEach(o => {
+									const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
+									rollEffect[tierKey] = o.description;
+								});
+							}
+							// Replace the last effect with our roll effect
+							current.effects[current.effects.length - 1] = rollEffect;
+							current.outcomes = [];
+						}
+					} else if (current.roll) {
 						const rollEffect = {
 							roll: `${current.roll.dice} + ${current.roll.bonus}`,
 						};
