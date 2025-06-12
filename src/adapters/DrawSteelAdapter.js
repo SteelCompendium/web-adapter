@@ -108,12 +108,11 @@ class DrawSteelAdapter extends BaseAdapter {
 			if (/^Trigger\s+/.test(line)) return true;
 			if (/^End Effect/.test(line)) return true;
 			if (/^\d+\+?\s+Malice/.test(line)) return true;
-			// check for trait names (PascalCase, ALL CAPS, or Title Case)
+			// check for trait names (Title Case, ALL CAPS, or PascalCase)
+			const articles = ["the", "of", "and", "a", "an", "in", "on", "at", "to", "for", "by", "with", "as", "but", "or", "nor", "so", "yet"];
 			const words = line.split(" ");
-			const isTitleCased = words.every(w => w.length > 0 && /^[A-Z]/.test(w));
+			const isTitleCased = words.every(w => articles.includes(w.toLowerCase()) || (w.length > 0 && /^[A-Z]/.test(w)));
 			if (isTitleCased) {
-				// but not if it's a multi-word line that looks like an effect
-				if (words.length > 4) return false;
 				const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
 				return !m;
 			}
@@ -153,8 +152,12 @@ class DrawSteelAdapter extends BaseAdapter {
 		};
 
 		while (idx < lines.length) {
-			const line = lines[idx++].trim();
-			if (!line) continue;
+			let line = lines[idx].trim();
+
+			if (!line) {
+				idx++;
+				continue;
+			}
 
 			// new action/maneuver header?
 			const headerRe = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
@@ -187,89 +190,65 @@ class DrawSteelAdapter extends BaseAdapter {
 						current.cost = details;
 					}
 				}
+				idx++;
 				continue;
 			}
 
-			if (!current) {
-				// Potential trait
-				const traitName = line.trim();
-				let effect = "";
-				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
-					effect += (effect ? " " : "") + lines[idx++].trim();
-				}
-
-				if (effect) {
-					statblock.traits.push({
-						name: traitName,
-						effect: effect,
-					});
-					continue;
-				}
-			}
-
-			// if we have a current action, but we encounter a new token that is NOT a recognized action token,
-			// then we should finalize the current action and re-process the line as a new token (e.g. trait)
-			if (current && isNewToken(line)
-				&& !/^Keywords\s+/.test(line)
-				&& !/^Distance\s+/.test(line)
-				&& !/^[✦★✸]/.test(line)
-				&& !/^Effect\s+/.test(line)
-				&& !/^Trigger\s+/.test(line)
-				&& !/^End Effect/.test(line)
-				&& !/^\d+\+?\s+Malice/.test(line)
-			) {
+			// If a trait name is encountered while parsing an ability, finalize the ability and start trait parsing
+			if (current && isNewToken(line) && !/^Keywords\s+/.test(line) && !/^Distance\s+/.test(line) && !/^[✦★✸]/.test(line) && !/^Effect\s+/.test(line) && !/^Trigger\s+/.test(line) && !/^End Effect/.test(line) && !/^\d+\+?\s+Malice/.test(line)) {
 				pushCurrent();
-				idx--; // re-process this line
+				current = null;
+				// Do not increment idx here; re-process this line as a trait
 				continue;
 			}
 
 			// Keywords
 			const kw = /^Keywords\s+(.+)$/.exec(line);
-			if (kw) {
+			if (kw && current) {
 				current.keywords = kw[1].split(/\s*,\s*/).map(s => s.trim());
+				idx++;
 				continue;
 			}
 
 			// Distance & Target
 			const dt = /^Distance\s+(.+?)\s+Target\s+(.+)$/.exec(line);
-			if (dt) {
+			if (dt && current) {
 				current.range = dt[1].trim();
 				current.target = dt[2].trim();
+				idx++;
 				continue;
 			}
 
 			// Outcomes: ✦ ★ ✸
 			const out = /^([✦★✸])\s*(≤?\d+(?:–\d+)?|\d+\+?)\s+(.+)$/.exec(line);
-			if (out) {
+			if (out && current) {
+				let description = out[3].trim();
+				let lookahead = idx + 1;
+				while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {
+					description += ` ${lines[lookahead++].trim()}`;
+				}
 				current.outcomes.push({
 					symbol: out[1],
 					threshold: out[2],
-					description: out[3].trim(),
+					description,
 				});
 				// If next line is not another outcome, push roll effect
-				if (idx >= lines.length || !/^([✦★✸])\s*/.test(lines[idx])) {
-					// Check if we have a roll from the header or from a previous effect
+				if (lookahead >= lines.length || !/^([✦★✸])\s*/.test(lines[lookahead])) {
 					if (!current.roll && current.effects.length > 0) {
 						const lastEffect = current.effects[current.effects.length - 1];
 						if (typeof lastEffect === "string" && lastEffect.includes("test")) {
-							// Create roll effect with the test description
-							const rollEffect = {
-								roll: lastEffect,
-							};
+							const rollEffect = { roll: lastEffect };
 							if (current.outcomes && current.outcomes.length > 0) {
 								current.outcomes.forEach(o => {
 									const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
 									rollEffect[tierKey] = o.description;
 								});
 							}
-							// Replace the last effect with our roll effect
 							current.effects[current.effects.length - 1] = rollEffect;
 							current.outcomes = [];
 						}
 					} else if (current.roll) {
-						const rollEffect = {
-							roll: `${current.roll.dice} + ${current.roll.bonus}`,
-						};
+						const rollEffect = { roll: `${current.roll.dice} + ${current.roll.bonus}` };
 						if (current.outcomes && current.outcomes.length > 0) {
 							current.outcomes.forEach(o => {
 								const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
@@ -280,42 +259,56 @@ class DrawSteelAdapter extends BaseAdapter {
 						current.outcomes = [];
 					}
 				}
+				idx = lookahead;
 				continue;
 			}
 
 			// Malice cost effect
 			const malice = /^(\d+\+?\s+Malice)\s+(.+)$/.exec(line);
-			if (malice) {
+			if (malice && current) {
 				let effectText = malice[2].trim();
-				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
-					effectText += ` ${lines[idx++].trim()}`;
+				let lookahead = idx + 1;
+				while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {
+					effectText += ` ${lines[lookahead++].trim()}`;
 				}
 				current.effects.push({
 					cost: malice[1],
 					effect: effectText,
 				});
+				idx = lookahead;
 				continue;
 			}
 
 			// Effect
 			const ef = /^Effect\s+(.+)$/.exec(line);
-			if (ef) {
+			if (ef && current) {
 				let effectText = ef[1].trim();
-				while (idx < lines.length && lines[idx].trim() && !isNewToken(lines[idx])) {
-					effectText += ` ${lines[idx++].trim()}`;
+				let lookahead = idx + 1;
+				while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {
+					effectText += ` ${lines[lookahead++].trim()}`;
 				}
 				current.effects.push(effectText);
+
+				// If the next line is a new token (trait or otherwise), finalize the current ability and let the main loop handle the next line
+				if (lookahead < lines.length && isNewToken(lines[lookahead]) && !/^Keywords\s+/.test(lines[lookahead]) && !/^Distance\s+/.test(lines[lookahead]) && !/^[✦★✸]/.test(lines[lookahead]) && !/^Effect\s+/.test(lines[lookahead]) && !/^Trigger\s+/.test(lines[lookahead]) && !/^End Effect/.test(lines[lookahead]) && !/^\d+\+?\s+Malice/.test(lines[lookahead])) {
+					pushCurrent();
+					current = null;
+					idx = lookahead;
+					continue;
+				}
+				idx = lookahead;
 				continue;
 			}
 
 			// Trigger
 			const tr = /^Trigger\s+(.+)$/.exec(line);
-			if (tr) {
+			if (tr && current) {
 				current.trigger = tr[1].trim();
-				// collect following indented lines
-				while (idx < lines.length && !isNewToken(lines[idx])) {
-					current.trigger += ` ${lines[idx++].trim()}`;
+				let lookahead = idx + 1;
+				while (lookahead < lines.length && !isNewToken(lines[lookahead])) {
+					current.trigger += ` ${lines[lookahead++].trim()}`;
 				}
+				idx = lookahead;
 				continue;
 			}
 
@@ -326,8 +319,9 @@ class DrawSteelAdapter extends BaseAdapter {
 				current = null;
 
 				let effectText = endEff[1].trim();
-				while (idx < lines.length && !isNewToken(lines[idx])) {
-					const nextLine = lines[idx++].trim();
+				let lookahead = idx + 1;
+				while (lookahead < lines.length && !isNewToken(lines[lookahead])) {
+					const nextLine = lines[lookahead++].trim();
 					if (nextLine) {
 						effectText += (effectText ? " " : "") + nextLine;
 					}
@@ -336,26 +330,28 @@ class DrawSteelAdapter extends BaseAdapter {
 					name: "End Effect",
 					effect: effectText || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
 				});
+				idx = lookahead;
 				continue;
 			}
 
-			if (!current && !isNewToken(line)) {
-				// Potential trait name
+			// Trait parsing (when not in an ability)
+			if (!current && isNewToken(line)) {
 				const traitName = line.trim();
 				let effect = "";
-				// The next line must be the effect
-				if (idx < lines.length && !isNewToken(lines[idx])) {
-					effect = lines[idx++].trim();
-					// And any following lines that are not new tokens are part of the effect
-					while (idx < lines.length && (lines[idx].startsWith(" ") || lines[idx].startsWith("\t") || !isNewToken(lines[idx]))) {
-						effect += ` ${lines[idx++].trim()}`;
+				if (idx + 1 < lines.length && !isNewToken(lines[idx + 1])) {
+					effect = lines[idx + 1].trim();
+					let lookahead = idx + 2;
+					while (lookahead < lines.length && !isNewToken(lines[lookahead])) {
+						effect += ` ${lines[lookahead++].trim()}`;
 					}
-
 					statblock.traits.push({
 						name: traitName,
 						effect: effect,
 					});
+					idx = lookahead;
+					continue;
 				}
+				idx++;
 				continue;
 			}
 
@@ -363,7 +359,10 @@ class DrawSteelAdapter extends BaseAdapter {
 			if (!line.trim()) {
 				pushCurrent();
 				current = null;
+				idx++;
 			}
+
+			idx++;
 		}
 
 		// push the last action
