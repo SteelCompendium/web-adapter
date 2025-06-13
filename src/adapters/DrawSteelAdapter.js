@@ -14,7 +14,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 1) Header: name, tags
 		const nameLine = lines[idx++];
-		const nameMatch = /^(.+?)\s+L\s*EVEL\s+(\d+)\s*(.*)$/i.exec(nameLine);
+		const nameMatch = /^(.+?)\s*L\s*EVEL\s+(\d+)\s*(.*)$/i.exec(nameLine);
 		const statblock = {
 			name: nameMatch ? nameMatch[1].trim() : nameLine,
 			level: nameMatch ? parseInt(nameMatch[2], 10) : 0,
@@ -28,7 +28,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 2) Type / Subtype / EV - map to ancestry array
 		const typeLine = lines[idx++];
-		const typeMatch = /^(.*?)\s+EV\s+(.+)$/.exec(typeLine);
+		const typeMatch = /^(.*?)\s*EV\s+(.+)$/.exec(typeLine);
 		if (typeMatch) {
 			statblock.ancestry = typeMatch[1].split(/,/).map(s => s.trim()).filter(Boolean);
 			statblock.ev = typeMatch[2].trim();
