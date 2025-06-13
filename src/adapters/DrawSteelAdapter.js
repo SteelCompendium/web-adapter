@@ -34,7 +34,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			statblock.ev = typeMatch[2].trim();
 		} else {
 			statblock.ancestry = typeLine.split(/,/).map(s => s.trim()).filter(Boolean);
-			statblock.ev = 0;
+			statblock.ev = "0";
 		}
 
 		// skip any blank lines
