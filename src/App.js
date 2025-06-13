@@ -52,7 +52,7 @@ TabPanel.propTypes = {
 function App() {
 	const [inputText, setInputText] = useState("");
 	const [outputText, setOutputText] = useState("");
-	const [sourceFormat, setSourceFormat] = useState("Draw Steel");
+	const [sourceFormat, setSourceFormat] = useState("Draw Steel Creature Statblock");
 	const [targetFormat, setTargetFormat] = useState("YAML");
 	const [error, setError] = useState("");
 	const [availableFormats, setAvailableFormats] = useState([]);
