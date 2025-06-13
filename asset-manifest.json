@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/statblock-adapter-gl-pages/static/js/main.b98b7f67.js",
+    "index.html": "/statblock-adapter-gl-pages/index.html",
+    "main.b98b7f67.js.map": "/statblock-adapter-gl-pages/static/js/main.b98b7f67.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.b98b7f67.js"
+  ]
+}
