@@ -25,13 +25,10 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 2) Type / Subtype / EV - map to ancestry array
 		const typeLine = lines[idx++];
-		const typeMatch = /^([^,]+)(?:,\s*([^,]+))?\s+EV\s+(.+)$/.exec(typeLine);
+		const typeMatch = /^(.*?)\s+EV\s+(.+)$/.exec(typeLine);
 		if (typeMatch) {
-			statblock.ancestry = [typeMatch[1].trim()];
-			if (typeMatch[2]) {
-				statblock.ancestry.push(typeMatch[2].trim());
-			}
-			statblock.ev = typeMatch[3].trim();
+			statblock.ancestry = typeMatch[1].split(/,/).map(s => s.trim()).filter(Boolean);
+			statblock.ev = typeMatch[2].trim();
 		} else {
 			statblock.ancestry = [];
 			statblock.ev = 0;
@@ -314,25 +311,56 @@ class DrawSteelAdapter extends BaseAdapter {
 			// Trait parsing (when not in an ability)
 			if (!current && isNewToken(line)) {
 				const traitName = line.trim();
-				let effect = "";
-				if (idx + 1 < lines.length && !isNewToken(lines[idx + 1])) {
-					effect = lines[idx + 1].trim();
-					let lookahead = idx + 2;
-					while (lookahead < lines.length && !isNewToken(lines[lookahead])) {
-						effect += ` ${lines[lookahead++].trim()}`;
+				const effects = [];
+				let lookahead = idx + 1;
+				let currentUnnamedEffectLines = [];
+
+				const flushUnnamedEffect = () => {
+					if (currentUnnamedEffectLines.length > 0) {
+						effects.push(currentUnnamedEffectLines.join(" "));
+						currentUnnamedEffectLines = [];
 					}
-					statblock.traits.push({
-						name: traitName,
-						effects: [effect],
-					});
-					idx = lookahead;
-				} else {
-					statblock.traits.push({
-						name: traitName,
-						effects: [],
-					});
-					idx++;
+				};
+
+				while (lookahead < lines.length && !isNewToken(lines[lookahead])) {
+					const effectLine = lines[lookahead].trim();
+					if (!effectLine) {
+						lookahead++;
+						continue;
+					}
+
+					const words = effectLine.split(" ");
+					const articles = ["the", "of", "and", "a", "an", "in", "on", "at", "to", "for", "by", "with", "as", "but", "or", "nor", "so", "yet"];
+					let titleCaseWords = 0;
+					for (const word of words) {
+						if (/^[A-Z]/.test(word) && !articles.includes(word.toLowerCase())) {
+							titleCaseWords++;
+						} else {
+							break;
+						}
+					}
+
+					if (titleCaseWords > 1 && titleCaseWords < words.length) {
+						flushUnnamedEffect();
+						const effectName = words.slice(0, titleCaseWords).join(" ");
+						const description = words.slice(titleCaseWords).join(" ").trim();
+						effects.push({ name: effectName, effect: description });
+					} else {
+						if (effects.length > 0 && typeof effects[effects.length - 1] === "object") {
+							effects[effects.length - 1].effect += ` ${effectLine}`;
+						} else {
+							currentUnnamedEffectLines.push(effectLine);
+						}
+					}
+					lookahead++;
 				}
+				flushUnnamedEffect();
+
+				statblock.traits.push({
+					name: traitName,
+					effects,
+				});
+				idx = lookahead;
 				continue;
 			}
 
