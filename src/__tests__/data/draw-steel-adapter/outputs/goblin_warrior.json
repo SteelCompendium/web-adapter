@@ -2,12 +2,12 @@
     "name": "GOBLIN WARRIOR",
     "level": 1,
     "roles": [
-        "HORDE",
-        "HARRIER"
+      "HORDE",
+      "HARRIER"
     ],
     "ancestry": [
-        "Goblin",
-        "Humanoid"
+      "Goblin",
+      "Humanoid"
     ],
     "ev": "3",
     "stamina": 15,
@@ -21,54 +21,54 @@
     "intuition": 0,
     "presence": -1,
     "traits": [
-        {
-            "name": "Crafty",
-            "effects": [
-                "The warrior doesn’t provoke opportunity attacks by moving."
-            ]
-        }
+      {
+        "name": "Crafty",
+        "effects": [
+          "The warrior doesn’t provoke opportunity attacks by moving."
+        ]
+      }
     ],
     "abilities": [
-        {
-            "name": "Spear Charge",
-            "type": "Action",
-            "keywords": [
-                "Charge",
-                "Melee",
-                "Strike",
-                "Weapon"
-            ],
-            "effects": [
-                {
-                    "roll": "2d10 + 2",
-                    "11 or lower": "3 damage",
-                    "12-16": "4 damage",
-                    "17+": "5 damage"
-                }
-            ],
-            "cost": "Signature",
-            "distance": "Melee 1",
-            "target": "One creature or object"
-        },
-        {
-            "name": "Bury the Point",
-            "type": "Action",
-            "keywords": [
-                "Melee",
-                "Strike",
-                "Weapon"
-            ],
-            "effects": [
-                {
-                    "roll": "2d10 + 2",
-                    "11 or lower": "5 damage; M<0 bleeding (save ends)",
-                    "12-16": "6 damage; M<1 bleeding (save ends)",
-                    "17+": "7 damage; M<2 bleeding (save ends)"
-                }
-            ],
-            "cost": "2 Malice",
-            "distance": "Melee 1",
-            "target": "One creature"
-        }
+      {
+        "name": "Spear Charge",
+        "type": "Action",
+        "cost": "Signature",
+        "keywords": [
+          "Charge",
+          "Melee",
+          "Strike",
+          "Weapon"
+        ],
+        "distance": "Melee 1",
+        "target": "One creature or object",
+        "effects": [
+          {
+            "roll": "2d10 + 2",
+            "11 or lower": "3 damage",
+            "12-16": "4 damage",
+            "17+": "5 damage"
+          }
+        ]
+      },
+      {
+        "name": "Bury the Point",
+        "type": "Action",
+        "cost": "2 Malice",
+        "keywords": [
+          "Melee",
+          "Strike",
+          "Weapon"
+        ],
+        "distance": "Melee 1",
+        "target": "One creature",
+        "effects": [
+          {
+            "roll": "2d10 + 2",
+            "11 or lower": "5 damage; M<0 bleeding (save ends)",
+            "12-16": "6 damage; M<1 bleeding (save ends)",
+            "17+": "7 damage; M<2 bleeding (save ends)"
+          }
+        ]
+      }
     ]
-}
+  }

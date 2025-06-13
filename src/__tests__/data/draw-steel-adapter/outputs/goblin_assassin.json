@@ -38,11 +38,14 @@
     {
       "name": "Sword Stab",
       "type": "Action",
+      "cost": "Signature",
       "keywords": [
         "Melee",
         "Strike",
         "Weapon"
       ],
+      "distance": "Melee 1",
+      "target": "One creature or object",
       "effects": [
         {
           "roll": "2d10 + 2",
@@ -51,18 +54,18 @@
           "17+": "7 damage"
         },
         "This ability deals an additional 2 damage if the assassin has an edge on the power roll."
-      ],
-      "cost": "Signature",
-      "distance": "Melee 1",
-      "target": "One creature or object"
+      ]
     },
     {
       "name": "Shadow Chains",
       "type": "Action",
+      "cost": "3 Malice",
       "keywords": [
         "Magic",
         "Ranged"
       ],
+      "distance": "Ranged 10",
+      "target": "Three creatures",
       "effects": [
         {
           "roll": "2d10 + 2",
@@ -70,10 +73,7 @@
           "12-16": "4 corruption damage; A<1 restrained (save ends)",
           "17+": "5 corruption damage; A<2 restrained (save ends)"
         }
-      ],
-      "cost": "3 Malice",
-      "distance": "Ranged 10",
-      "target": "Three creatures"
+      ]
     }
   ]
 }
