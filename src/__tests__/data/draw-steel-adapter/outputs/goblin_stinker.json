@@ -24,7 +24,9 @@
     "traits": [
         {
             "name": "Crafty",
-            "effect": "The stinker doesn’t provoke opportunity attacks by moving."
+            "effects": [
+                "The stinker doesn’t provoke opportunity attacks by moving."
+            ]
         }
     ],
     "abilities": [

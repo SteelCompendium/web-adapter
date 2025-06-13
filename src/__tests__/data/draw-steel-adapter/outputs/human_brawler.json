@@ -27,11 +27,15 @@
     "traits": [
         {
             "name": "Shoot the Hostage",
-            "effect": "The brawler takes half damage from strikes if they have a creature or object grabbed. The grabbed creature or object takes the other half of the damage."
+            "effects": [
+                "The brawler takes half damage from strikes if they have a creature or object grabbed. The grabbed creature or object takes the other half of the damage."
+            ]
         },
         {
             "name": "Supernatural Insight",
-            "effect": "The brawler ignores concealment if it’s granted by a supernatural effect, or the target is supernatural."
+            "effects": [
+                "The brawler ignores concealment if it’s granted by a supernatural effect, or the target is supernatural."
+            ]
         }
     ],
     "abilities": [
