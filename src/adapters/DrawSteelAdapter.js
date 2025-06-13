@@ -312,6 +312,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				continue;
 			}
 
+			// TODO - this is just a trait.  remove this.
 			// End Effect
 			const endEff = /^End Effect\s*(.*)$/.exec(line);
 			if (endEff) {
@@ -328,7 +329,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				}
 				statblock.traits.push({
 					name: "End Effect",
-					effect: effectText || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way.",
+					effects: [effectText || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way."],
 				});
 				idx = lookahead;
 				continue;
@@ -346,7 +347,7 @@ class DrawSteelAdapter extends BaseAdapter {
 					}
 					statblock.traits.push({
 						name: traitName,
-						effect: effect,
+						effects: [effect],
 					});
 					idx = lookahead;
 					continue;

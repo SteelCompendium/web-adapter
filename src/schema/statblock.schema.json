@@ -136,7 +136,7 @@
       "type": "object",
       "required": [
         "name",
-        "effect"
+        "effects"
       ],
       "additionalProperties": false,
       "properties": {
@@ -148,9 +148,8 @@
           "type": "string",
           "description": "Optional action-type of the trait (e.g., Maneuver)."
         },
-        "effect": {
-          "type": "string",
-          "description": "Description of the trait's effect."
+        "effects": {
+          "$ref": "ability.schema.json#/definitions/effectsArray"
         }
       }
     }

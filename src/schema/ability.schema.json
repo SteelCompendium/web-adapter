@@ -48,6 +48,12 @@
       "description": "Left-margin indentation for nested lists"
     },
     "effects": {
+      "$ref": "#/definitions/effectsArray"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "effectsArray": {
       "type": "array",
       "minItems": 1,
       "description": "List of effects (flexible formats)",
@@ -70,10 +76,7 @@
           }
         ]
       }
-    }
-  },
-  "additionalProperties": false,
-  "definitions": {
+    },
     "powerRollEffect": {
       "type": "object",
       "required": [
