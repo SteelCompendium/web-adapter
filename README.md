@@ -14,7 +14,7 @@ A web-based tool for converting tabletop RPG statblocks between different format
 
 ## 🚀 Live Demo
 
-Visit the live application at: `https://[your-username].github.io/statblock-adapter-gl-pages`
+Visit the live application at: https://steelcompendium.io/statblock-adapter-gl-pages/
 
 ## 🛠️ Development
 
