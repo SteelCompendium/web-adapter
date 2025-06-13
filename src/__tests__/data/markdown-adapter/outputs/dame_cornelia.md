@@ -1,20 +1,13 @@
 | DAME CORNELIA | LEVEL 1 LEADER |
-
 |:---|---:|
-
 | **Undead** | **EV** 12 |
+| **Stamina** 80 | **Immunity** Corruption 2, Psychic 2 |
+| **Speed** 5 | **Size** 1M **Stability** 2 |
+|   | **Free Strike** 4 |
 
-
-
-**Stamina** 80 &nbsp; &nbsp; **Immunity** Corruption 2, Psychic 2
-
-**Speed** 5 &nbsp; &nbsp; **Size** 1M &nbsp; &nbsp; **Stability** 2 &nbsp; &nbsp; **Free Strike** 4
-
----
-
-**Might** 3 &nbsp; **Agility** 2 &nbsp; **Reason** 2 &nbsp; **Intuition** 0 &nbsp; **Presence** 2
-
----
+|             |               |              |                 |                |
+| ----------- | ------------- | ------------ | --------------- | -------------- |
+| **Might** 3 | **Agility** 2 | **Reason** 2 | **Intuition** 0 | **Presence** 2 |
 
 ## Zweihander Swing (Action)
 

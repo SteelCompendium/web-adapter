@@ -14,32 +14,39 @@ class MarkdownAdapter extends BaseAdapter {
 		const lines = [];
 
 		// Header
+		const headerLines = [];
 		const role = statblock.roles?.join(" ").toUpperCase() || "";
-		lines.push(
+		headerLines.push(
 			`| ${statblock.name} | LEVEL ${statblock.level} ${role} |`,
 		);
-		lines.push("|:---|---:|");
-		lines.push(`| **${statblock.ancestry?.join(", ") || "Unknown"}** | **EV** ${statblock.ev} |`);
-		lines.push("");
+		headerLines.push("|:---|---:|");
+		headerLines.push(`| **${statblock.ancestry?.join(", ") || "Unknown"}** | **EV** ${statblock.ev} |`);
 
 		// Stats
-		let stats = `**Stamina** ${statblock.stamina}`;
+		const staminaLine = `**Stamina** ${statblock.stamina}`;
+		let immunityLine = "";
 		if (statblock.immunities && statblock.immunities.length > 0) {
-			stats += ` &nbsp; &nbsp; **Immunity** ${statblock.immunities.join(", ")}`;
+			immunityLine = `**Immunity** ${statblock.immunities.join(", ")}`;
 		}
-		lines.push(stats);
+		headerLines.push(`| ${staminaLine} | ${immunityLine} |`);
 
-		let secondaryStats = `**Speed** ${statblock.speed}`;
+		const speedLine = `**Speed** ${statblock.speed}`;
+		const rightColParts = [];
 		if (statblock.size) {
-			secondaryStats += ` &nbsp; &nbsp; **Size** ${statblock.size}`;
+			rightColParts.push(`**Size** ${statblock.size}`);
 		}
 		if (statblock.stability) {
-			secondaryStats += ` &nbsp; &nbsp; **Stability** ${statblock.stability}`;
+			rightColParts.push(`**Stability** ${statblock.stability}`);
 		}
+
+		if (statblock.speed || rightColParts.length > 0) {
+			headerLines.push(`| ${speedLine} | ${rightColParts.join(" ")} |`);
+		}
+
 		if (statblock.free_strike) {
-			secondaryStats += ` &nbsp; &nbsp; **Free Strike** ${statblock.free_strike}`;
+			headerLines.push(`|   | **Free Strike** ${statblock.free_strike} |`);
 		}
-		lines.push(secondaryStats);
+		lines.push(headerLines.join("\n"));
 		lines.push("---");
 
 		// Attributes
