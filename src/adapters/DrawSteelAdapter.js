@@ -58,22 +58,45 @@ class DrawSteelAdapter extends BaseAdapter {
 		// skip any blank lines
 		while (idx < lines.length && !lines[idx]) idx++;
 
-		// 4, 5) Speed, Size, Stability, Free Strike, etc.
-		// These can be on one line or split across multiple lines.
-		// We will loop until we find the stats line.
+		// 4, 5, 6) Speed, Size, Stability, Free Strike, Stats, etc.
+		// These can be on one line or split across multiple lines, in any order.
+		// We will loop until we find an ability or trait.
 		statblock.speed = 0;
 		statblock.size = "";
 		statblock.stability = 0;
 		statblock.free_strike = 0;
+		statblock.might = 0;
+		statblock.agility = 0;
+		statblock.reason = 0;
+		statblock.intuition = 0;
+		statblock.presence = 0;
+
+		const statsKeywords = ["Speed", "Size", "Stability", "Free Strike", "Might", "Agility", "Reason", "Intuition", "Presence", "With Captain", "Immunity", "Weakness"];
 
 		while (idx < lines.length) {
 			const line = lines[idx];
-			if (!line) { // skip blank line
+
+			// Stop if we hit an ability or trait.
+			// The start of the next section is either an ability (e.g., "Sword Stab (Action)") or a trait (e.g., "Crafty").
+			// The ability/trait parsing logic has more robust checks, so we'll just check for some basic keywords here
+			// to know when to stop.
+			const abilityHeaderRe = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/;
+			if (abilityHeaderRe.test(line)) {
+				break;
+			}
+
+			// If the line doesn't contain any known stat-block keywords, we assume it's a trait and stop here.
+			// The next section will handle it.
+			if (!statsKeywords.some(kw => line.includes(kw))) {
+				// but allow for blank lines to be skipped
+				if (line.trim()) {
+					break;
+				}
+			}
+
+			if (!line.trim()) { // skip blank line
 				idx++;
 				continue;
-			}
-			if (/Might\s*([+-−]?\d+)/.test(line)) {
-				break; // Found stats line
 			}
 
 			const speedMatch = /Speed\s+([\d\s()A-z]+?)(?=\s*Size|\s*\/|$)/i.exec(line);
@@ -101,28 +124,36 @@ class DrawSteelAdapter extends BaseAdapter {
 				statblock.with_captain = captainMatch[1].trim();
 			}
 
+			const mightMatch = /Might\s+([+-−]?\d+)/.exec(line);
+			if (mightMatch) {
+				statblock.might = parseInt(mightMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
+			const agilityMatch = /Agility\s+([+-−]?\d+)/.exec(line);
+			if (agilityMatch) {
+				statblock.agility = parseInt(agilityMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
+			const reasonMatch = /Reason\s+([+-−]?\d+)/.exec(line);
+			if (reasonMatch) {
+				statblock.reason = parseInt(reasonMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
+			const intuitionMatch = /Intuition\s+([+-−]?\d+)/.exec(line);
+			if (intuitionMatch) {
+				statblock.intuition = parseInt(intuitionMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
+			const presenceMatch = /Presence\s+([+-−]?\d+)/.exec(line);
+			if (presenceMatch) {
+				statblock.presence = parseInt(presenceMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
 			idx++;
 		}
 
 		// skip any blank lines
 		while (idx < lines.length && !lines[idx]) idx++;
-
-		// 6) Stats
-		const statsLine = lines[idx++];
-		const statsMatch = /^Might\s*([+-−]?\d+)\s+Agility\s*([+-−]?\d+)\s+Reason\s*([+-−]?\d+)\s+Intuition\s*([+-−]?\d+)\s+Presence\s*([+-−]?\d+)$/.exec(statsLine);
-		if (statsMatch) {
-			statblock.might = parseInt(statsMatch[1].replace("−", "-").replace("+", ""), 10);
-			statblock.agility = parseInt(statsMatch[2].replace("−", "-").replace("+", ""), 10);
-			statblock.reason = parseInt(statsMatch[3].replace("−", "-").replace("+", ""), 10);
-			statblock.intuition = parseInt(statsMatch[4].replace("−", "-").replace("+", ""), 10);
-			statblock.presence = parseInt(statsMatch[5].replace("−", "-").replace("+", ""), 10);
-		} else {
-			statblock.might = 0;
-			statblock.agility = 0;
-			statblock.reason = 0;
-			statblock.intuition = 0;
-			statblock.presence = 0;
-		}
 
 		// Initialize schema-compliant arrays
 		statblock.traits = [];
