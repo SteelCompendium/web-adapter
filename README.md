@@ -1,188 +1,176 @@
-# Statblock Adapter - GitHub Pages
+# Statblock Adapter
 
-A web-based tool for converting tabletop RPG statblocks between different formats. Paste your statblock on the left, select your desired output format, and get the converted result on the right.
-
-## 🎯 Features
-
-- **Multiple Input Formats**: Support for D&D 5e, Pathfinder, and custom formats
-- **Multiple Output Formats**: JSON, XML, YAML, and Markdown
-- **Auto-Detection**: Automatically detect input format when possible
-- **Modern UI**: Clean, responsive interface with real-time feedback
-- **Copy to Clipboard**: Easy copying of converted results
-- **Character Counter**: Track input length
-- **Status Indicators**: Visual feedback for conversion status
+A web-based tool for converting tabletop RPG statblocks between different formats. Paste a statblock on the left, select your desired output format, and get the converted result on the right.
 
 ## 🚀 Live Demo
 
-Visit the live application at: https://steelcompendium.io/statblock-adapter-gl-pages/
+Visit the live application at: https://steelcompendium.github.io/statblock-adapter-gl-pages/
+
+## 🎯 Features
+
+- **Multiple Input/Output Formats**: Supports "Draw Steel", JSON, YAML, and Markdown.
+- **Modern UI**: Clean, responsive interface built with React and Material-UI.
+- **Real-time Conversion**: Instantly see the converted output as you type.
+- **Copy to Clipboard**: Easily copy the converted statblock.
+- **Schema Validation**: Converted JSON is validated against a schema.
 
 ## 🛠️ Development
 
 ### Project Structure
 
 ```
+.
 ├── .github/
 │   └── workflows/
-│       └── main.yml          # GitHub Actions CI/CD
+│       └── deploy.yml        # GitHub Actions CI/CD for deploying to GitHub Pages
+├── build/                    # The output of the build process, deployed to GitHub pages
 ├── public/
-│   └── index.html           # Main application
-├── LICENSE
+│   └── index.html            # Main application shell
+├── src/
+│   ├── adapters/             # Contains the logic for parsing and formatting statblocks
+│   ├── components/           # React components for the UI
+│   ├── schema/               # JSON schema definitions for statblock data
+│   ├── validation/           # Validation logic using the schemas
+│   ├── App.js                # Main application component
+│   └── index.js              # Entry point for the React application
+├── package.json
 └── README.md
 ```
 
 ### Local Development
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/[your-username]/statblock-adapter-gl-pages.git
-   cd statblock-adapter-gl-pages
-   ```
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-2. Serve the `public` directory locally:
-   ```bash
-   # Using Python
-   cd public && python -m http.server 8000
-   
-   # Using Node.js
-   npx serve public
-   
-   # Using PHP
-   cd public && php -S localhost:8000
-   ```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/SteelCompendium/statblock-adapter-gl-pages.git
+    cd statblock-adapter-gl-pages
+    ```
 
-3. Open `http://localhost:8000` in your browser
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-### GitHub Pages Setup
+3.  **Run the development server:**
+    ```bash
+    npm start
+    ```
+    This runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload when you make changes.
 
-1. Go to your repository settings
-2. Navigate to "Pages" in the sidebar
-3. Under "Source", select "GitHub Actions"
-4. The workflow will automatically deploy on pushes to `main`
+### Building for Production
+
+To create a production-ready build, run:
+```bash
+npm run build
+```
+This builds the app for production to the `build` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
 
 ## 🔧 Architecture
 
-### StatblockConverter Class
+The conversion logic is built on an **Adapter Pattern**. This makes it easy to add support for new statblock formats.
 
-The main conversion logic is handled by the `StatblockConverter` class with the following structure:
+### Core Components
 
-```javascript
-class StatblockConverter {
-  // Parsers for different input formats
-  parsers = {
-    'auto': autoDetectParser,
-    'dnd5e': parseDnD5e,
-    'pathfinder': parsePathfinder,
-    'custom': parseCustom
-  }
-  
-  // Formatters for different output formats
-  formatters = {
-    'json': formatAsJSON,
-    'xml': formatAsXML,
-    'yaml': formatAsYAML,
-    'markdown': formatAsMarkdown
-  }
-}
-```
+-   `AdapterRegistry`: A singleton that manages all the available adapters. It's responsible for orchestrating the conversion process by selecting the correct source and target adapters.
+-   `BaseAdapter`: An abstract base class that defines the interface for all adapters. Each adapter must implement `parse()`, `format()`, and `getName()`.
+-   **Adapters** (e.g., `DrawSteelAdapter`, `JsonAdapter`): Concrete implementations of `BaseAdapter`. Each adapter handles a specific statblock format.
 
-### Adding New Formats
+### Conversion Flow
 
-#### Input Parsers
-
-To add a new input format:
-
-1. Add a new parser method to the `StatblockConverter` class
-2. Register it in the `parsers` object
-3. Add the option to the input format selector in HTML
-
-```javascript
-parseNewFormat(input) {
-  // Parse the input text and return a standardized object
-  return {
-    name: "Creature Name",
-    type: "creature type",
-    // ... other properties
-  };
-}
-```
-
-#### Output Formatters
-
-To add a new output format:
-
-1. Add a new formatter method to the `StatblockConverter` class
-2. Register it in the `formatters` object
-3. Add the option to the output format selector in HTML
-
-```javascript
-formatAsNewFormat(data) {
-  // Convert the standardized object to your desired format
-  return "formatted string";
-}
-```
+1.  The UI calls the `AdapterRegistry.convert()` method with the input text, source format, and target format.
+2.  The `AdapterRegistry` retrieves the appropriate source and target adapter.
+3.  The source adapter's `parse()` method is called to convert the input text into a standardized JavaScript object.
+4.  The target adapter's `format()` method is called with the standardized object to produce the final output string.
+5.  If the output is JSON, it is validated against the official schema.
 
 ## 📝 Data Format
 
-The internal data structure used between parsers and formatters:
+The internal standardized data structure used between parsing and formatting is based on the JSON Schema defined in `src/schema/statblock.schema.json`. This ensures consistency and allows for validation.
+
+Here is a simplified view of the main properties:
 
 ```javascript
 {
-  name: string,           // Creature name
-  type: string,           // Creature type (humanoid, beast, etc.)
-  size: string,           // Size category (Small, Medium, Large, etc.)
-  alignment: string,      // Alignment
-  ac: number,            // Armor Class
-  hp: number,            // Hit Points
-  speed: string,         // Speed description
-  stats: {               // Ability scores
-    str: number,
-    dex: number,
-    con: number,
-    int: number,
-    wis: number,
-    cha: number
-  },
-  // Additional fields can be added as needed
-  raw_input: string      // Original input for reference
+  "name": "string",
+  "level": "integer",
+  "roles": ["string"],
+  "ancestry": ["string"],
+  "ev": "string",
+  "stamina": "integer",
+  "speed": "string",
+  "size": "string",
+  "stability": "integer",
+  "free_strike": "integer",
+  "might": "integer",
+  "agility": "integer",
+  "reason": "integer",
+  "intuition": "integer",
+  "presence": "integer",
+  "traits": [/* ... */],
+  "abilities": [/* ... */]
 }
 ```
+For the complete and detailed schema, please refer to `src/schema/statblock.schema.json` and `src/schema/ability.schema.json`.
+
+## 🧩 Adding New Formats
+
+To add support for a new format, you need to create a new adapter class.
+
+1.  **Create the Adapter Class**:
+    Create a new file in `src/adapters/`, for example `MyFormatAdapter.js`. The class must extend `BaseAdapter` and implement the `getName()`, `parse()`, and `format()` methods.
+
+    ```javascript
+    import BaseAdapter from './BaseAdapter';
+
+    class MyFormatAdapter extends BaseAdapter {
+      getName() {
+        return 'My Format';
+      }
+
+      parse(text) {
+        // Convert the input text into the standardized statblock object
+        const statblock = { /* ... */ };
+        return statblock;
+      }
+
+      format(statblock) {
+        // Convert the standardized statblock object into a string
+        return '...formatted string...';
+      }
+    }
+
+    export default MyFormatAdapter;
+    ```
+
+2.  **Register the Adapter**:
+    In `src/adapters/AdapterRegistry.js`, import your new adapter and register it in the `registerDefaultAdapters` method.
+
+    ```javascript
+    // src/adapters/AdapterRegistry.js
+    import MyFormatAdapter from './MyFormatAdapter';
+
+    class AdapterRegistry {
+      // ...
+      registerDefaultAdapters() {
+        // ...
+        this.registerAdapter(new MyFormatAdapter());
+      }
+      // ...
+    }
+    ```
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-format`
-3. Make your changes
-4. Test locally
-5. Commit your changes: `git commit -am 'Add new format support'`
-6. Push to the branch: `git push origin feature/new-format`
-7. Submit a pull request
+Contributions are welcome! Please follow these steps:
 
-### Development Guidelines
-
-- Keep the single-file architecture for simplicity
-- Add TODO comments for stub implementations
-- Maintain responsive design principles
-- Test with various statblock formats
-- Update this README when adding new features
-
-## 📋 TODO
-
-- [ ] Implement D&D 5e parser
-- [ ] Implement Pathfinder parser
-- [ ] Add auto-detection logic
-- [ ] Improve XML formatter
-- [ ] Add more output formats (CSV, etc.)
-- [ ] Add validation for parsed data
-- [ ] Add unit tests
-- [ ] Add error handling for malformed input
-- [ ] Add support for more RPG systems
+1.  Fork the repository.
+2.  Create a new feature branch: `git checkout -b feature/my-new-feature`
+3.  Make your changes.
+4.  Commit your changes: `git commit -am 'Add some feature'`
+5.  Push to the branch: `git push origin feature/my-new-feature`
+6.  Submit a pull request.
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built for the tabletop RPG community
-- Inspired by the need for format standardization
-- Uses modern web technologies for accessibility
