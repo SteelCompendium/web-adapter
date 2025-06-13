@@ -58,36 +58,50 @@ class DrawSteelAdapter extends BaseAdapter {
 		// skip any blank lines
 		while (idx < lines.length && !lines[idx]) idx++;
 
-		// 4) Speed / Size / Stability
-		const speedLine = lines[idx++];
-		const speedMatch = /^Speed\s+(\d+)(?:\s*\(([^)]+)\))?\s+Size\s+(.+?)\s*\/\s*Stability\s+(\d+)$/.exec(speedLine);
-		if (speedMatch) {
-			const baseSpeed = speedMatch[1];
-			const speedExtra = speedMatch[2];
-			if (speedExtra) {
-				statblock.speed = `${baseSpeed} (${speedExtra})`;
-			} else {
-				statblock.speed = baseSpeed;
+		// 4, 5) Speed, Size, Stability, Free Strike, etc.
+		// These can be on one line or split across multiple lines.
+		// We will loop until we find the stats line.
+		statblock.speed = 0;
+		statblock.size = "";
+		statblock.stability = 0;
+		statblock.free_strike = 0;
+
+		while (idx < lines.length) {
+			const line = lines[idx];
+			if (!line) { // skip blank line
+				idx++;
+				continue;
 			}
-			statblock.size = speedMatch[3].trim();
-			statblock.stability = parseInt(speedMatch[4], 10);
-		} else {
-			statblock.speed = 0;
-			statblock.size = "";
-			statblock.stability = 0;
-		}
+			if (/Might\s*([+-−]?\d+)/.test(line)) {
+				break; // Found stats line
+			}
 
-		// skip any blank lines
-		while (idx < lines.length && !lines[idx]) idx++;
+			const speedMatch = /Speed\s+([\d\s()A-z]+?)(?=\s*Size|\s*\/|$)/i.exec(line);
+			if (speedMatch) {
+				statblock.speed = speedMatch[1].trim();
+			}
 
-		// 5) Free Strike
-		const fsLine = lines[idx++];
-		const fsMatch = /Free Strike\s+(\d+)/.exec(fsLine);
-		statblock.free_strike = fsMatch ? parseInt(fsMatch[1], 10) : 0;
+			const sizeMatch = /Size\s+(.+?)(?=\s*\/|$)/i.exec(line);
+			if (sizeMatch) {
+				statblock.size = sizeMatch[1].trim();
+			}
 
-		const captainMatch = /With Captain\s+(.+?)(?=\s+Free Strike|$)/.exec(fsLine);
-		if (captainMatch) {
-			statblock.with_captain = captainMatch[1].trim();
+			const stabilityMatch = /Stability\s+(\d+)/i.exec(line);
+			if (stabilityMatch) {
+				statblock.stability = parseInt(stabilityMatch[1], 10);
+			}
+
+			const fsMatch = /Free Strike\s+(\d+)/.exec(line);
+			if (fsMatch) {
+				statblock.free_strike = parseInt(fsMatch[1], 10);
+			}
+
+			const captainMatch = /With Captain\s+(.+?)(?=\s+Free Strike|$)/.exec(line);
+			if (captainMatch) {
+				statblock.with_captain = captainMatch[1].trim();
+			}
+
+			idx++;
 		}
 
 		// skip any blank lines
