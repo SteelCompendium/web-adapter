@@ -52,6 +52,12 @@
             "effects": [
                 "The werewolf’s ferocity is expressed through rage. Their abilities are capable of inflicting rage points on enemies (excluding stormwight furies). If a creature has 10 or more rage at the start of their turn, they expend all of their rage, shift up to their speed towards the nearest creature, and make a melee free strike against them. A creature that takes damage in this way gains 1 rage. All accumulated rage disappears after completing a respite."
             ]
+        },
+        {
+            "name": "Vukenstep",
+            "effects": [
+                "The werewolf ignores difficult terrain."
+            ]
         }
     ],
     "abilities": [

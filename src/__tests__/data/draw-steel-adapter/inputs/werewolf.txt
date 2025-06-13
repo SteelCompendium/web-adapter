@@ -68,6 +68,8 @@ them.
 Distance Melee 1 Target 1 creature
 Effect The target is knocked prone and takes 5 damage before 
 executing the ability. 
+Vukenstep
+The werewolf ignores difficult terrain.
 Howl (Villain Action 1) 
 Keywords Area
 Distance 5 burst Target All enemies in the burst
