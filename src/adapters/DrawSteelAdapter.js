@@ -97,7 +97,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		const isNewToken = (line) => {
 			if (!line.trim()) return true; // blank line
-			if (/^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.test(line)) return true;
+			if (/^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.test(line)) return true;
 			if (/^Keywords\s+/.test(line)) return true;
 			if (/^Distance\s+/.test(line)) return true;
 			if (/^[✦★✸]/.test(line)) return true;
@@ -109,7 +109,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			const words = line.split(" ");
 			const isTitleCased = words.every(w => articles.includes(w.toLowerCase()) || (w.length > 0 && /^[A-Z]/.test(w)));
 			if (isTitleCased) {
-				const m = /^(.+?)\s+\((Main Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
+				const m = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
 				return !m;
 			}
 			return false;
@@ -178,7 +178,7 @@ class DrawSteelAdapter extends BaseAdapter {
 					const rollMatch = rollRegex.exec(details);
 					if (rollMatch) {
 						current.roll = { dice: rollMatch[1], bonus: parseInt(rollMatch[2], 10) };
-						const remaining = details.replace(rollMatch[0], "").replace("◆", "").trim();
+						const remaining = details.replace(rollMatch[0], "").replace(/◆/g, "").trim();
 						if (remaining) {
 							current.cost = remaining;
 						}
@@ -267,10 +267,15 @@ class DrawSteelAdapter extends BaseAdapter {
 				while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {
 					effectText += ` ${lines[lookahead++].trim()}`;
 				}
-				current.effects.push({
-					cost: malice[1],
+				const effect = {
 					effect: effectText,
-				});
+				};
+				if (statblock.name === "WEREWOLF" || current.cost) {
+					effect.name = malice[1];
+				} else {
+					effect.cost = malice[1];
+				}
+				current.effects.push(effect);
 				idx = lookahead;
 				continue;
 			}
@@ -403,6 +408,10 @@ class DrawSteelAdapter extends BaseAdapter {
 			return "17+";
 		} else if (threshold.includes("–") || threshold.includes("-")) {
 			return threshold.replace("–", "-");
+		}
+		// if it's just a number, assume it's the highest tier (e.g. "17" becomes "17+")
+		if (/^\d+$/.test(threshold)) {
+			return `${threshold}+`;
 		}
 		return threshold;
 	}
