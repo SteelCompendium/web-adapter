@@ -65,6 +65,14 @@
       "description": "List of immunities (e.g., Magic 2, Psionic 2).",
       "default": []
     },
+    "weaknesses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of weaknesses (e.g., acid 3, holy 1).",
+      "default": []
+    },
     "speed": {
       "type": "string",
       "description": "Movement speed of the creature, may include parenthetical modifiers (e.g., '5 (climb)').",

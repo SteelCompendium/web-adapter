@@ -39,9 +39,14 @@ class DrawSteelAdapter extends BaseAdapter {
 		const staminaMatch = /^Stamina\s+(\d+)/.exec(staminaLine);
 		statblock.stamina = staminaMatch ? parseInt(staminaMatch[1], 10) : 0;
 
-		const immunityMatch = /Immunity\s+(.+)$/i.exec(staminaLine);
+		const immunityMatch = /Immunity\s+([^/]+)/i.exec(staminaLine);
 		if (immunityMatch) {
-			statblock.immunities = immunityMatch[1].split(/\s*,\s*/).map(s => s.trim());
+			statblock.immunities = immunityMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
+		}
+
+		const weaknessMatch = /Weakness\s+(.+)/i.exec(staminaLine);
+		if (weaknessMatch) {
+			statblock.weaknesses = weaknessMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
 		}
 
 		// 4) Speed / Size / Stability
