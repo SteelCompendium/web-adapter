@@ -2,7 +2,7 @@ import BaseAdapter from "./BaseAdapter";
 
 class DrawSteelAdapter extends BaseAdapter {
 	getName() {
-		return "Draw Steel";
+		return "Draw Steel Creature Statblock";
 	}
 
 	parse(text) {
@@ -174,7 +174,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 				const details = m[3] ? m[3].trim() : "";
 				if (details) {
-					const rollRegex = /(\d+d\d+)\s*\+\s*(\d+)/;
+					const rollRegex = /(\d+[dD]\d+)\s*\+\s*(\d+)/;
 					const rollMatch = rollRegex.exec(details);
 					if (rollMatch) {
 						current.roll = { dice: rollMatch[1], bonus: parseInt(rollMatch[2], 10) };
