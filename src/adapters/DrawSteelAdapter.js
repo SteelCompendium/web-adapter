@@ -96,7 +96,6 @@ class DrawSteelAdapter extends BaseAdapter {
 		}
 
 		// Initialize schema-compliant arrays
-		if (!statblock.immunities) statblock.immunities = [];
 		statblock.traits = [];
 		statblock.abilities = [];
 
