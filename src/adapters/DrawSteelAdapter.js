@@ -237,6 +237,7 @@ class DrawSteelAdapter extends BaseAdapter {
 					effects: [],
 					trigger: "",
 					sub_effects: [],
+					parsing_outcomes: false,
 				};
 
 				const details = m[3] ? m[3].trim() : "";
@@ -268,7 +269,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			// Keywords
 			const kw = /^Keywords\s+(.+)$/.exec(line);
 			if (kw && current) {
-				current.keywords = kw[1].split(/\s*,\s*/).map(s => s.trim());
+				current.keywords.push(...kw[1].split(/\s*,\s*/).map(s => s.trim()));
 				idx++;
 				continue;
 			}
@@ -282,9 +283,26 @@ class DrawSteelAdapter extends BaseAdapter {
 				continue;
 			}
 
+			const distanceRe = /^Distance\s+(.+)/i;
+			const distanceMatch = distanceRe.exec(line);
+			if (distanceMatch && current && !current.parsing_outcomes) {
+				current.range = distanceMatch[1].trim();
+				idx++;
+				continue;
+			}
+
+			const targetRe = /^Target\s+(.+)/i;
+			const targetMatch = targetRe.exec(line);
+			if (targetMatch && current && !current.parsing_outcomes) {
+				current.target = targetMatch[1].trim();
+				idx++;
+				continue;
+			}
+
 			// Outcomes: ✦ ★ ✸
 			const out = /^([✦★✸])\s*(≤?\d+(?:–\d+)?|\d+\+?)\s+(.+)$/.exec(line);
 			if (out && current) {
+				current.parsing_outcomes = true;
 				let description = out[3].trim();
 				let lookahead = idx + 1;
 				while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {

@@ -44,6 +44,8 @@
         "Strike",
         "Weapon"
       ],
+      "distance": "Melee 1",
+      "target": "One creature or object",
       "effects": [
         {
           "roll": "2d10 + 2",
@@ -62,6 +64,8 @@
         "Magic",
         "Ranged"
       ],
+      "distance": "Ranged 10",
+      "target": "Three creatures",
       "effects": [
         {
           "roll": "2d10 + 2",
