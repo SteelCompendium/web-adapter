@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/[your-username]/statblock-adapter-gl-pages.git"
+    "url": "git+https://github.com/SteelCompendium/statblock-adapter-gl-pages.git"
   },
   "keywords": [
     "draw-steel",
@@ -27,9 +27,9 @@
   "author": "Your Name",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/[your-username]/statblock-adapter-gl-pages/issues"
+    "url": "https://github.com/SteelCompendium/statblock-adapter-gl-pages/issues"
   },
-  "homepage": ".",
+  "homepage": "https://SteelCompendium.github.io/statblock-adapter-gl-pages",
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
