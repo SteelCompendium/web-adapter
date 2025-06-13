@@ -270,7 +270,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				const effect = {
 					effect: effectText,
 				};
-				if (statblock.name === "WEREWOLF" || current.cost) {
+				if (statblock.name === "WEREWOLF" || (current.cost && /malice/i.test(current.cost))) {
 					effect.name = malice[1];
 				} else {
 					effect.cost = malice[1];
