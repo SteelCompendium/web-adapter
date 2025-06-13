@@ -106,7 +106,6 @@ class DrawSteelAdapter extends BaseAdapter {
 			if (/^[✦★✸]/.test(line)) return true;
 			if (/^Effect\s+/.test(line)) return true;
 			if (/^Trigger\s+/.test(line)) return true;
-			if (/^End Effect/.test(line)) return true;
 			if (/^\d+\+?\s+Malice/.test(line)) return true;
 			// check for trait names (Title Case, ALL CAPS, or PascalCase)
 			const articles = ["the", "of", "and", "a", "an", "in", "on", "at", "to", "for", "by", "with", "as", "but", "or", "nor", "so", "yet"];
@@ -195,7 +194,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			}
 
 			// If a trait name is encountered while parsing an ability, finalize the ability and start trait parsing
-			if (current && isNewToken(line) && !/^Keywords\s+/.test(line) && !/^Distance\s+/.test(line) && !/^[✦★✸]/.test(line) && !/^Effect\s+/.test(line) && !/^Trigger\s+/.test(line) && !/^End Effect/.test(line) && !/^\d+\+?\s+Malice/.test(line)) {
+			if (current && isNewToken(line) && !/^Keywords\s+/.test(line) && !/^Distance\s+/.test(line) && !/^[✦★✸]/.test(line) && !/^Effect\s+/.test(line) && !/^Trigger\s+/.test(line) && !/^\d+\+?\s+Malice/.test(line)) {
 				pushCurrent();
 				current = null;
 				// Do not increment idx here; re-process this line as a trait
@@ -290,7 +289,7 @@ class DrawSteelAdapter extends BaseAdapter {
 				current.effects.push(effectText);
 
 				// If the next line is a new token (trait or otherwise), finalize the current ability and let the main loop handle the next line
-				if (lookahead < lines.length && isNewToken(lines[lookahead]) && !/^Keywords\s+/.test(lines[lookahead]) && !/^Distance\s+/.test(lines[lookahead]) && !/^[✦★✸]/.test(lines[lookahead]) && !/^Effect\s+/.test(lines[lookahead]) && !/^Trigger\s+/.test(lines[lookahead]) && !/^End Effect/.test(lines[lookahead]) && !/^\d+\+?\s+Malice/.test(lines[lookahead])) {
+				if (lookahead < lines.length && isNewToken(lines[lookahead]) && !/^Keywords\s+/.test(lines[lookahead]) && !/^Distance\s+/.test(lines[lookahead]) && !/^[✦★✸]/.test(lines[lookahead]) && !/^Effect\s+/.test(lines[lookahead]) && !/^Trigger\s+/.test(lines[lookahead]) && !/^\d+\+?\s+Malice/.test(lines[lookahead])) {
 					pushCurrent();
 					current = null;
 					idx = lookahead;
@@ -312,29 +311,6 @@ class DrawSteelAdapter extends BaseAdapter {
 				continue;
 			}
 
-			// TODO - this is just a trait.  remove this.
-			// End Effect
-			const endEff = /^End Effect\s*(.*)$/.exec(line);
-			if (endEff) {
-				pushCurrent();
-				current = null;
-
-				let effectText = endEff[1].trim();
-				let lookahead = idx + 1;
-				while (lookahead < lines.length && !isNewToken(lines[lookahead])) {
-					const nextLine = lines[lookahead++].trim();
-					if (nextLine) {
-						effectText += (effectText ? " " : "") + nextLine;
-					}
-				}
-				statblock.traits.push({
-					name: "End Effect",
-					effects: [effectText || "At the end of their turn, the creature can take 5 damage to end one save ends effect affecting them. This damage can't be reduced in any way."],
-				});
-				idx = lookahead;
-				continue;
-			}
-
 			// Trait parsing (when not in an ability)
 			if (!current && isNewToken(line)) {
 				const traitName = line.trim();
@@ -350,9 +326,13 @@ class DrawSteelAdapter extends BaseAdapter {
 						effects: [effect],
 					});
 					idx = lookahead;
-					continue;
+				} else {
+					statblock.traits.push({
+						name: traitName,
+						effects: [],
+					});
+					idx++;
 				}
-				idx++;
 				continue;
 			}
 
