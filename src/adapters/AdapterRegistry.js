@@ -1,6 +1,7 @@
 import DrawSteelAdapter from "./DrawSteelAdapter";
 import JsonAdapter from "./JsonAdapter";
 import YamlAdapter from "./YamlAdapter";
+import MarkdownAdapter from "./MarkdownAdapter";
 import validator from "../validation/validator";
 
 class AdapterRegistry {
@@ -13,6 +14,7 @@ class AdapterRegistry {
 		this.registerAdapter(new DrawSteelAdapter());
 		this.registerAdapter(new JsonAdapter());
 		this.registerAdapter(new YamlAdapter());
+		this.registerAdapter(new MarkdownAdapter());
 		// Register more default adapters here
 	}
 
