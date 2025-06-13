@@ -23,6 +23,9 @@ class DrawSteelAdapter extends BaseAdapter {
 				: [],
 		};
 
+		// skip any blank lines
+		while (idx < lines.length && !lines[idx]) idx++;
+
 		// 2) Type / Subtype / EV - map to ancestry array
 		const typeLine = lines[idx++];
 		const typeMatch = /^(.*?)\s+EV\s+(.+)$/.exec(typeLine);
@@ -33,6 +36,9 @@ class DrawSteelAdapter extends BaseAdapter {
 			statblock.ancestry = [];
 			statblock.ev = 0;
 		}
+
+		// skip any blank lines
+		while (idx < lines.length && !lines[idx]) idx++;
 
 		// 3) Stamina
 		const staminaLine = lines[idx++];
@@ -48,6 +54,9 @@ class DrawSteelAdapter extends BaseAdapter {
 		if (weaknessMatch) {
 			statblock.weaknesses = weaknessMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
 		}
+
+		// skip any blank lines
+		while (idx < lines.length && !lines[idx]) idx++;
 
 		// 4) Speed / Size / Stability
 		const speedLine = lines[idx++];
@@ -68,6 +77,9 @@ class DrawSteelAdapter extends BaseAdapter {
 			statblock.stability = 0;
 		}
 
+		// skip any blank lines
+		while (idx < lines.length && !lines[idx]) idx++;
+
 		// 5) Free Strike
 		const fsLine = lines[idx++];
 		const fsMatch = /Free Strike\s+(\d+)/.exec(fsLine);
@@ -77,6 +89,9 @@ class DrawSteelAdapter extends BaseAdapter {
 		if (captainMatch) {
 			statblock.with_captain = captainMatch[1].trim();
 		}
+
+		// skip any blank lines
+		while (idx < lines.length && !lines[idx]) idx++;
 
 		// 6) Stats
 		const statsLine = lines[idx++];
