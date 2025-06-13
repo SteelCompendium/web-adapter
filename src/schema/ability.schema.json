@@ -12,9 +12,9 @@
       "type": "string",
       "description": "The title or description of the ability"
     },
-    "flavor": {
+    "type": {
       "type": "string",
-      "description": "Flavor text of the ability"
+      "description": "Ability type (e.g., \"Action\", \"Maneuver\", \"Triggered Action\", \"Villain Action 1\")"
     },
     "cost": {
       "type": "string",
@@ -26,10 +26,6 @@
         "type": "string"
       },
       "description": "Keywords associated with the ability (e.g., [\"Magic\",\"Earth\",\"Melee\"])"
-    },
-    "type": {
-      "type": "string",
-      "description": "Ability type (e.g., \"Action\", \"Maneuver\", \"Triggered Action\", \"Villain Action 1\")"
     },
     "distance": {
       "type": "string",
@@ -43,12 +39,16 @@
       "type": "string",
       "description": "Trigger condition for triggered actions"
     },
+    "effects": {
+      "$ref": "#/definitions/effectsArray"
+    },
+    "flavor": {
+      "type": "string",
+      "description": "Flavor text of the ability"
+    },
     "indent": {
       "type": "integer",
       "description": "Left-margin indentation for nested lists"
-    },
-    "effects": {
-      "$ref": "#/definitions/effectsArray"
     }
   },
   "additionalProperties": false,

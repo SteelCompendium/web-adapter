@@ -120,16 +120,17 @@ class DrawSteelAdapter extends BaseAdapter {
 		const pushCurrent = () => {
 			if (!current) return;
 
+			// Create the ability object with properties in the desired order
 			const ability = {
 				name: current.name,
 				type: this.mapActionTypeToAbilityType(current.category),
-				keywords: current.keywords,
-				effects: current.effects || [],
 			};
 
 			if (current.cost) {
 				ability.cost = current.cost;
 			}
+
+			ability.keywords = current.keywords;
 
 			if (current.range) {
 				ability.distance = current.range;
@@ -142,6 +143,8 @@ class DrawSteelAdapter extends BaseAdapter {
 			if (current.trigger) {
 				ability.trigger = current.trigger;
 			}
+
+			ability.effects = current.effects || [];
 
 			statblock.abilities.push(ability);
 			current = null;
