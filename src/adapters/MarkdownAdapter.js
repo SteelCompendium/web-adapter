@@ -89,37 +89,44 @@ class MarkdownAdapter extends BaseAdapter {
 			}).join("\n");
 		};
 
-		// Abilities
-		statblock.abilities?.forEach((ability) => {
-			lines.push(`## ${ability.name} (${ability.type})`);
-			if (ability.cost) {
-				lines.push(`**Cost:** ${ability.cost}`);
-			}
-			if (ability.keywords?.length > 0) {
-				lines.push(`**Keywords** ${ability.keywords.join(", ")}`);
-			}
-			if (ability.distance) {
-				lines.push(`**Distance** ${ability.distance}`);
-			}
-			if (ability.target) {
-				lines.push(`**Target** ${ability.target}`);
-			}
-			if (ability.trigger) {
-				lines.push(`**Trigger** ${ability.trigger}`);
-			}
-			if (ability.effects) {
-				lines.push(`**Effect** ${formatEffects(ability.effects)}`);
-			}
-			lines.push("---");
-		});
-
 		// Traits
 		statblock.traits?.forEach((trait) => {
-			lines.push(`## ${trait.name}`);
+			const traitLines = [];
+			traitLines.push(`## ${trait.name}`);
 			if (trait.effect) {
-				lines.push(`**Effect** ${trait.effect}`);
+				traitLines.push(`**Effect** ${trait.effect}`);
 			}
-			lines.push("---");
+			if (trait.effects) {
+				traitLines.push(`**Effect** ${formatEffects(trait.effects)}`);
+			}
+			lines.push(traitLines.join("\n"));
+		});
+
+		lines.push("---");
+
+		// Abilities
+		statblock.abilities?.forEach((ability) => {
+			const abilityLines = [];
+			abilityLines.push(`## ${ability.name} (${ability.type})`);
+			if (ability.cost) {
+				abilityLines.push(`**Cost:** ${ability.cost}`);
+			}
+			if (ability.keywords?.length > 0) {
+				abilityLines.push(`**Keywords** ${ability.keywords.join(", ")}`);
+			}
+			if (ability.distance) {
+				abilityLines.push(`**Distance** ${ability.distance}`);
+			}
+			if (ability.target) {
+				abilityLines.push(`**Target** ${ability.target}`);
+			}
+			if (ability.trigger) {
+				abilityLines.push(`**Trigger** ${ability.trigger}`);
+			}
+			if (ability.effects) {
+				abilityLines.push(`**Effect** ${formatEffects(ability.effects)}`);
+			}
+			lines.push(abilityLines.join("\n"));
 		});
 
 		return lines.join("\n\n");
