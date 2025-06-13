@@ -5,6 +5,7 @@
 | **Speed** 5 | **Size** 1M **Stability** 2 |
 |   | **Free Strike** 4 |
 
+
 |             |               |              |                 |                |
 | ----------- | ------------- | ------------ | --------------- | -------------- |
 | **Might** 3 | **Agility** 2 | **Reason** 2 | **Intuition** 0 | **Presence** 2 |
