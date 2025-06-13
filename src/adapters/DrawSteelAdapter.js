@@ -335,7 +335,7 @@ class DrawSteelAdapter extends BaseAdapter {
 					}
 
 					const words = effectLine.split(" ");
-					const articles = ["the", "of", "and", "a", "an", "in", "on", "at", "to", "for", "by", "with", "as", "but", "or", "nor", "so", "yet"];
+					const articles = ["the", "of", "and", "a", "an", "in", "on", "at", "to", "for", "by", "with", "as", "but", "or", "nor", "so", "yet", "if"];
 					let titleCaseWords = 0;
 					for (const word of words) {
 						if (/^[A-Z]/.test(word) && !articles.includes(word.toLowerCase())) {
