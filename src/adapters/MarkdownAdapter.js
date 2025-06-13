@@ -47,7 +47,6 @@ class MarkdownAdapter extends BaseAdapter {
 			headerLines.push(`|   | **Free Strike** ${statblock.free_strike} |`);
 		}
 		lines.push(headerLines.join("\n"));
-		lines.push("---");
 
 		// Attributes
 		const attributes = [
@@ -57,8 +56,12 @@ class MarkdownAdapter extends BaseAdapter {
 			`**Intuition** ${statblock.intuition}`,
 			`**Presence** ${statblock.presence}`,
 		];
-		lines.push(attributes.join(" &nbsp; "));
-		lines.push("---");
+		const attrLines = [];
+		attrLines.push("");
+		attrLines.push("|             |               |              |                 |                |");
+		attrLines.push("| ----------- | ------------- | ------------ | --------------- | -------------- |");
+		attrLines.push(`| ${attributes.join(" | ")} |`);
+		lines.push(attrLines.join("\n"));
 
 		const formatEffects = (effects) => {
 			if (!effects) return "";
