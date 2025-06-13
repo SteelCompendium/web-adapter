@@ -33,7 +33,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			statblock.ancestry = typeMatch[1].split(/,/).map(s => s.trim()).filter(Boolean);
 			statblock.ev = typeMatch[2].trim();
 		} else {
-			statblock.ancestry = [];
+			statblock.ancestry = typeLine.split(/,/).map(s => s.trim()).filter(Boolean);
 			statblock.ev = 0;
 		}
 
@@ -60,7 +60,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 4) Speed / Size / Stability
 		const speedLine = lines[idx++];
-		const speedMatch = /^Speed\s+(\d+)(?:\s*\(([^)]+)\))?\s+Size\s+(\S+)\s*\/\s*Stability\s+(\d+)$/.exec(speedLine);
+		const speedMatch = /^Speed\s+(\d+)(?:\s*\(([^)]+)\))?\s+Size\s+(.+?)\s*\/\s*Stability\s+(\d+)$/.exec(speedLine);
 		if (speedMatch) {
 			const baseSpeed = speedMatch[1];
 			const speedExtra = speedMatch[2];
@@ -69,7 +69,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			} else {
 				statblock.speed = baseSpeed;
 			}
-			statblock.size = speedMatch[3];
+			statblock.size = speedMatch[3].trim();
 			statblock.stability = parseInt(speedMatch[4], 10);
 		} else {
 			statblock.speed = 0;
