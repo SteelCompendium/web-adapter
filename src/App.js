@@ -28,7 +28,7 @@ function TabPanel({ children, value, index, sx, ...other }) {
 			{...other}
 			sx={{
 				flexGrow: 1,
-				display: "flex",
+				display: value === index ? "flex" : "none",
 				flexDirection: "column",
 				...sx,
 			}}
