@@ -107,7 +107,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			// The start of the next section is either an ability (e.g., "Sword Stab (Action)") or a trait (e.g., "Crafty").
 			// The ability/trait parsing logic has more robust checks, so we'll just check for some basic keywords here
 			// to know when to stop.
-			const abilityHeaderRe = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/;
+			const abilityHeaderRe = /^(.+?)\s+\(\s*(Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\s*\)/;
 			if (abilityHeaderRe.test(line)) {
 				break;
 			}
@@ -203,7 +203,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		const isNewToken = (line) => {
 			if (!line.trim()) return true; // blank line
-			if (/^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.test(line)) return true;
+			if (/^(.+?)\s+\(\s*(Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\s*\)/.test(line)) return true;
 			if (/^Keywords\s+/.test(line)) return true;
 			if (/^Distance\s+/.test(line)) return true;
 			if (/^[✦★✸]/.test(line)) return true;
@@ -215,7 +215,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			const words = line.split(" ");
 			const isTitleCased = words.every(w => articles.includes(w.toLowerCase()) || (w.length > 0 && /^[A-Z]/.test(w)));
 			if (isTitleCased) {
-				const m = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)/.exec(line);
+				const m = /^(.+?)\s+\(\s*(Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\s*\)/.exec(line);
 				return !m;
 			}
 			return false;
@@ -265,7 +265,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			}
 
 			// new action/maneuver header?
-			const headerRe = /^(.+?)\s+\((Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\)(?:\s*◆\s*(.+))?$/;
+			const headerRe = /^(.+?)\s+\(\s*(Main Action|Action|Maneuver|Free Triggered Action|Triggered Action|Villain Action\s*\d+)\s*\)(?:\s*◆\s*(.+))?$/;
 			const m = headerRe.exec(line);
 			if (m) {
 				pushCurrent();
