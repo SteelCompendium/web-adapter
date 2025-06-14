@@ -237,7 +237,6 @@ const JSONValidator = ({ onValidData }) => {
 								alignItems: "center",
 								justifyContent: "center",
 								textAlign: "center",
-								backgroundColor: "#f9f9f9",
 							}}
 						>
 							<Typography variant="body1" color="text.secondary">
