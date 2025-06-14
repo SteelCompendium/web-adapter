@@ -342,47 +342,68 @@ class DrawSteelAdapter extends BaseAdapter {
 			}
 
 			// Outcomes: ✦ ★ ✸
-			const out = /^([✦★✸])\s*(≤?\d+(?:–\d+)?|\d+\+?)\s+(.+)$/.exec(line);
+			const outRe = /^([✦★✸])(.*)$/;
+			const out = outRe.exec(line);
 			if (out && current) {
 				current.parsing_outcomes = true;
-				let description = out[3].trim();
+				let restOfLine = out[2].trim();
 				let lookahead = idx + 1;
-				while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {
-					description += ` ${lines[lookahead++].trim()}`;
+
+				if (!restOfLine) {
+					if (lookahead < lines.length) {
+						restOfLine = lines[lookahead].trim();
+						lookahead++;
+					}
 				}
-				current.outcomes.push({
-					symbol: out[1],
-					threshold: out[2],
-					description,
-				});
-				// If next line is not another outcome, push roll effect
-				if (lookahead >= lines.length || !/^([✦★✸])\s*/.test(lines[lookahead])) {
-					if (!current.roll && current.effects.length > 0) {
-						const lastEffect = current.effects[current.effects.length - 1];
-						if (typeof lastEffect === "string" && lastEffect.includes("test")) {
-							const rollEffect = { roll: lastEffect };
+
+				const outcomePartsRe = /^(≤?\d+(?:–\d+)?|\d+\+?)\s+(.+)$/;
+				const outcomeParts = outcomePartsRe.exec(restOfLine);
+
+				if (outcomeParts) {
+					const threshold = outcomeParts[1];
+					let description = outcomeParts[2].trim();
+
+					while (lookahead < lines.length && lines[lookahead].trim() && !isNewToken(lines[lookahead])) {
+						description += ` ${lines[lookahead++].trim()}`;
+					}
+					current.outcomes.push({
+						symbol: out[1],
+						threshold,
+						description,
+					});
+					// If next line is not another outcome, push roll effect
+					if (lookahead >= lines.length || !/^([✦★✸])\s*/.test(lines[lookahead])) {
+						if (!current.roll && current.effects.length > 0) {
+							const lastEffect = current.effects[current.effects.length - 1];
+							if (typeof lastEffect === "string" && lastEffect.includes("test")) {
+								const rollEffect = { roll: lastEffect };
+								if (current.outcomes && current.outcomes.length > 0) {
+									current.outcomes.forEach(o => {
+										const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
+										rollEffect[tierKey] = o.description;
+									});
+								}
+								current.effects[current.effects.length - 1] = rollEffect;
+								current.outcomes = [];
+							}
+						} else if (current.roll) {
+							const rollEffect = { roll: `${current.roll.dice} + ${current.roll.bonus}` };
 							if (current.outcomes && current.outcomes.length > 0) {
 								current.outcomes.forEach(o => {
 									const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
 									rollEffect[tierKey] = o.description;
 								});
 							}
-							current.effects[current.effects.length - 1] = rollEffect;
+							current.effects.push(rollEffect);
 							current.outcomes = [];
 						}
-					} else if (current.roll) {
-						const rollEffect = { roll: `${current.roll.dice} + ${current.roll.bonus}` };
-						if (current.outcomes && current.outcomes.length > 0) {
-							current.outcomes.forEach(o => {
-								const tierKey = this.mapOutcomeToTierKey(o.symbol, o.threshold);
-								rollEffect[tierKey] = o.description;
-							});
-						}
-						current.effects.push(rollEffect);
-						current.outcomes = [];
 					}
+					idx = lookahead;
+					continue;
 				}
-				idx = lookahead;
+				// if we are here, it means we couldn't parse the outcome.
+				// just advance the line and let it be handled as a trait or effect
+				idx++;
 				continue;
 			}
 

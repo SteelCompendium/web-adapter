@@ -39,7 +39,8 @@ Distance Melee 1
 Target 1 creature or object
 ✦ ≤11 9 damage; 2 rage
 ★ 12–16 13 damage; 4 rage
-✸ 17 16 damage; 5 rage
+✸
+17 16 damage; 5 rage
 2 Malice The target has P<0 lycanthropy. The potency of this
 ability increases by 1 each time the werewolf forces the same
 target to resist it.
@@ -53,14 +54,16 @@ Distance Melee 1
 Target Two creatures or objects
 ✦ ≤11 8 damage; M<1 bleeding (save ends)
 ★ 12–16 11 damage; 1 rage; M<2 bleeding (save ends)
-✸ 17 14 damage; 3 rage; M<3 bleeding (save ends)
+✸
+17 14 damage; 3 rage; M<3 bleeding (save ends)
 Berserker Slash (Action) ◆ 2d10 + 3 ◆ 3 Malice
 Keywords Area, Melee, Weapon
 Distance 1 burst
 Target All enemies and objects in the burst
 ✦ ≤11 4 damage; push 2
 ★ 12–16 6 damage; 1 rage; push 3
-✸ 17 7 damage; 3 rage; slide 3
+✸
+17 7 damage; 3 rage; slide 3
 Effect The werewolf shifts up to their speed before using this
 ability.
 Wall Leap (Maneuver)
@@ -89,7 +92,8 @@ Effect Each target makes an Intuition test.
 ✸ ≤11 Target moves up to their speed away from the
 werewolf; frightened (save ends)
 ★ 12–16 Frightened (EoT)
-✦ 17 no effect
+✦
+17 no effect
 Effect Enemies that have 1 or more rage gain 4 rage and howl
 along with the werewolf.
 Full Wolf (Villain Action 2)
@@ -109,6 +113,7 @@ Distance 2 burst
 Target All creatures in the burst
 ✦ ≤11 5 damage; 2 rage; M<1 bleeding (save ends)
 ★ 12–16 8 damage; 4 rage; M<2 bleeding (save ends)
-✸ 17 11 damage; 8 rage; M<3 bleeding (save ends)
+✸
+17 11 damage; 8 rage; M<3 bleeding (save ends)
 Effect The werewolf shifts up to their speed before and after
 using this ability.
