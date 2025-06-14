@@ -14,14 +14,33 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 1) Header: name, tags
 		const nameLine = lines[idx++];
-		const nameMatch = /^(.+?)\s*L\s*EVEL\s+(\d+)\s*(.*)$/i.exec(nameLine);
+		let levelLine = "";
 		const statblock = {
-			name: nameMatch ? nameMatch[1].trim() : nameLine,
-			level: nameMatch ? parseInt(nameMatch[2], 10) : 0,
-			roles: nameMatch && nameMatch[3]
-				? nameMatch[3].split(/\s+/).map(t => t.trim()).filter(Boolean)
-				: [],
+			name: nameLine,
+			level: 0,
+			roles: [],
 		};
+
+		// Check if the next line has the level info
+		if (idx < lines.length && /L\s*EVEL/i.test(lines[idx])) {
+			levelLine = lines[idx++];
+		} else if (/L\s*EVEL/i.test(nameLine)) {
+			// for backwards compatibility, check if the name line has the level info
+			levelLine = nameLine;
+			// in this case, we need to extract the name from the line
+			const nameMatch = /^(.+?)\s*L\s*EVEL/im.exec(nameLine);
+			if (nameMatch) {
+				statblock.name = nameMatch[1].trim();
+			}
+		}
+
+		if (levelLine) {
+			const levelMatch = /L\s*EVEL\s+(\d+)\s*(.*)/im.exec(levelLine);
+			if (levelMatch) {
+				statblock.level = parseInt(levelMatch[1], 10);
+				statblock.roles = levelMatch[2] ? levelMatch[2].split(/\s+/).map(t => t.trim()).filter(Boolean) : [];
+			}
+		}
 
 		// skip any blank lines
 		while (idx < lines.length && !lines[idx]) idx++;
