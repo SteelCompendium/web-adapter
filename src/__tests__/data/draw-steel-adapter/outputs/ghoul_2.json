@@ -24,5 +24,39 @@
     "intuition": 0,
     "presence": -1,
     "traits": [],
-    "abilities": []
+    "abilities": [
+      {
+        "name": "Razor Claws",
+        "type": "Action",
+        "cost": "Signature",
+        "keywords": [
+          "Charge",
+          "Melee",
+          "Strike",
+          "Weapon"
+        ],
+        "distance": "Melee 1",
+        "target": "One creature or object",
+        "effects": [
+          {
+            "roll": "2d10 + 2",
+            "11 or lower": "3 damage",
+            "12-16": "4 damage",
+            "17+": "5 damage; M<2 bleeding (save ends)"
+          }
+        ]
+      },
+      {
+        "name": "Leap",
+        "type": "Maneuver",
+        "keywords": [
+          "—"
+        ],
+        "distance": "Self",
+        "target": "Self",
+        "effects": [
+          "The ghoul jumps 3 squares. If they land on a size 1 enemy, that enemy is knocked prone and the ghoul makes a free strike against them."
+        ]
+      }
+    ]
   }

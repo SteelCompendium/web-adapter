@@ -97,7 +97,7 @@ class DrawSteelAdapter extends BaseAdapter {
 		statblock.intuition = 0;
 		statblock.presence = 0;
 
-		const statsKeywords = ["Speed", "Size", "Stability", "Free Strike", "Might", "Agility", "Reason", "Intuition", "Presence", "With Captain", "Immunity", "Weakness"];
+		const statsKeywords = ["Speed", "Size", "Stability", "Free Strike", "Might", "Agility", "Reason", "Intuition", "Presence", "With Captain", "Immunity", "Weakness", "Target"];
 
 		while (idx < lines.length) {
 			const line = lines[idx];
@@ -295,7 +295,7 @@ class DrawSteelAdapter extends BaseAdapter {
 			}
 
 			// If a trait name is encountered while parsing an ability, finalize the ability and start trait parsing
-			if (current && isNewToken(line) && !/^Keywords\s+/.test(line) && !/^Distance\s+/.test(line) && !/^[✦★✸]/.test(line) && !/^Effect\s+/.test(line) && !/^Trigger\s+/.test(line) && !/^\d+\+?\s+Malice/.test(line)) {
+			if (current && isNewToken(line) && !/^Keywords\s+/.test(line) && !/^Distance\s+/.test(line) && !/^Target\s+/.test(line) && !/^[✦★✸]/.test(line) && !/^Effect\s+/.test(line) && !/^Trigger\s+/.test(line) && !/^\d+\+?\s+Malice/.test(line)) {
 				pushCurrent();
 				current = null;
 				// Do not increment idx here; re-process this line as a trait

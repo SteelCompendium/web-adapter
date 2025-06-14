@@ -12,3 +12,17 @@ Agility +2
 Reason −2
 Intuition 0
 Presence −1
+Razor Claws (Action) ◆ 2d10 + 2 ◆ Signature
+Keywords Charge, Melee, Strike, Weapon
+Distance Melee 1
+Target One creature or object
+✦ ≤11 3 damage
+★ 12–16 4 damage
+✸ 17+ 5 damage; M<2 bleeding (save ends)
+Leap (Maneuver)
+Keywords —
+Distance Self
+Target Self
+Effect The ghoul jumps 3 squares. If they land on a size 1 enemy,
+that enemy is knocked prone and the ghoul makes a free strike
+against them.
