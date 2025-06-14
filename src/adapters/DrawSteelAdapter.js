@@ -71,14 +71,14 @@ class DrawSteelAdapter extends BaseAdapter {
 		const staminaMatch = /^Stamina\s+(\d+)/.exec(staminaLine);
 		statblock.stamina = staminaMatch ? parseInt(staminaMatch[1], 10) : 0;
 
-		const immunityMatch = /Immunity\s+([^/]+)/i.exec(staminaLine);
-		if (immunityMatch) {
-			statblock.immunities = immunityMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
+		const immunityMatchOnStamina = /Immunity\s+([^/]+)/i.exec(staminaLine);
+		if (immunityMatchOnStamina) {
+			statblock.immunities = immunityMatchOnStamina[1].trim().split(/\s*,\s*/).map(s => s.trim());
 		}
 
-		const weaknessMatch = /Weakness\s+(.+)/i.exec(staminaLine);
-		if (weaknessMatch) {
-			statblock.weaknesses = weaknessMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
+		const weaknessMatchOnStamina = /Weakness\s+(.+)/i.exec(staminaLine);
+		if (weaknessMatchOnStamina) {
+			statblock.weaknesses = weaknessMatchOnStamina[1].trim().split(/\s*,\s*/).map(s => s.trim());
 		}
 
 		// skip any blank lines
@@ -173,6 +173,16 @@ class DrawSteelAdapter extends BaseAdapter {
 			const presenceMatch = /Presence\s+([+-−]?\d+)/.exec(line);
 			if (presenceMatch) {
 				statblock.presence = parseInt(presenceMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
+			const weaknessMatch = /Weakness\s+(.+)/i.exec(line);
+			if (weaknessMatch) {
+				statblock.weaknesses = weaknessMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
+			}
+
+			const immunityMatch = /Immunity\s+(.+)/i.exec(line);
+			if (immunityMatch) {
+				statblock.immunities = immunityMatch[1].trim().split(/\s*,\s*/).map(s => s.trim());
 			}
 
 			idx++;
