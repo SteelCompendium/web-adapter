@@ -47,7 +47,7 @@ class DrawSteelAdapter extends BaseAdapter {
 
 		// 2) Type / Subtype / EV - map to ancestry array
 		let typeLine = lines[idx++];
-		let typeMatch = /^(.*?)\s*EV\s+(.+)$/.exec(typeLine);
+		const typeMatch = /^(.*?)\s*EV\s+(.+)$/.exec(typeLine);
 		if (typeMatch) {
 			statblock.ancestry = typeMatch[1].split(/,/).map(s => s.trim()).filter(Boolean);
 			statblock.ev = typeMatch[2].trim();
@@ -56,10 +56,10 @@ class DrawSteelAdapter extends BaseAdapter {
 			// EV might be on the next line
 			if (idx < lines.length && /^\s*EV\s+/.test(lines[idx])) {
 				typeLine = lines[idx++];
-				typeMatch = /^\s*EV\s+(.+)$/.exec(typeLine);
-				statblock.ev = typeMatch ? typeMatch[1].trim() : "0";
-			} else {
-				statblock.ev = "0";
+				const evMatch = /^\s*EV\s+(.+)$/.exec(typeLine);
+				if (evMatch) {
+					statblock.ev = evMatch[1].trim();
+				}
 			}
 		}
 
@@ -96,8 +96,9 @@ class DrawSteelAdapter extends BaseAdapter {
 		statblock.reason = 0;
 		statblock.intuition = 0;
 		statblock.presence = 0;
+		statblock.ev = statblock.ev || "0";
 
-		const statsKeywords = ["Speed", "Size", "Stability", "Free Strike", "Might", "Agility", "Reason", "Intuition", "Presence", "With Captain", "Immunity", "Weakness", "Target"];
+		const statsKeywords = ["Speed", "Size", "Stability", "Free Strike", "Might", "Agility", "Reason", "Intuition", "Presence", "With Captain", "Immunity", "Weakness", "Target", "EV"];
 
 		while (idx < lines.length) {
 			const line = lines[idx];
@@ -173,6 +174,11 @@ class DrawSteelAdapter extends BaseAdapter {
 			const presenceMatch = /Presence\s+([+-−]?\d+)/.exec(line);
 			if (presenceMatch) {
 				statblock.presence = parseInt(presenceMatch[1].replace("−", "-").replace("+", ""), 10);
+			}
+
+			const evMatch = /EV\s+(.+)/i.exec(line);
+			if (evMatch) {
+				statblock.ev = evMatch[1].trim();
 			}
 
 			const weaknessMatch = /Weakness\s+(.+)/i.exec(line);
