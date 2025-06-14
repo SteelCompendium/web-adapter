@@ -23,7 +23,20 @@
     "reason": -2,
     "intuition": 0,
     "presence": -1,
-    "traits": [],
+    "traits": [
+      {
+        "name": "Hunger",
+        "effects": [
+          "If the ghoul charges, their speed increases by 2 until the end of their turn."
+        ]
+      },
+      {
+        "name": "Arise",
+        "effects": [
+          "The first time the ghoul is reduced to Stamina 0 by damage that isn’t fire damage or holy damage and their body isn’t destroyed, they regain 1 Stamina and fall prone."
+        ]
+      }
+    ],
     "abilities": [
       {
         "name": "Razor Claws",
