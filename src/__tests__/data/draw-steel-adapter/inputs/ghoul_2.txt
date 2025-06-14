@@ -1,6 +1,7 @@
 GHOUL
 LEVEL 1 HORDE HARRIER
-UndeadEV 3
+Undead
+EV 3
 Stamina 15
 Speed 7
 Might 0

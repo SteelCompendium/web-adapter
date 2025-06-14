@@ -46,14 +46,21 @@ class DrawSteelAdapter extends BaseAdapter {
 		while (idx < lines.length && !lines[idx]) idx++;
 
 		// 2) Type / Subtype / EV - map to ancestry array
-		const typeLine = lines[idx++];
-		const typeMatch = /^(.*?)\s*EV\s+(.+)$/.exec(typeLine);
+		let typeLine = lines[idx++];
+		let typeMatch = /^(.*?)\s*EV\s+(.+)$/.exec(typeLine);
 		if (typeMatch) {
 			statblock.ancestry = typeMatch[1].split(/,/).map(s => s.trim()).filter(Boolean);
 			statblock.ev = typeMatch[2].trim();
 		} else {
 			statblock.ancestry = typeLine.split(/,/).map(s => s.trim()).filter(Boolean);
-			statblock.ev = "0";
+			// EV might be on the next line
+			if (idx < lines.length && /^\s*EV\s+/.test(lines[idx])) {
+				typeLine = lines[idx++];
+				typeMatch = /^\s*EV\s+(.+)$/.exec(typeLine);
+				statblock.ev = typeMatch ? typeMatch[1].trim() : "0";
+			} else {
+				statblock.ev = "0";
+			}
 		}
 
 		// skip any blank lines
