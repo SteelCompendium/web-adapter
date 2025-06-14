@@ -15,6 +15,7 @@ and is then destroyed.
 ✸ 17+ 12 damage; A<2 prone can’t stand (EoT)
 3+ Malice The wallmaster chooses an additional wall segment and 
 target for every 3 malice spent.
+The Delian Tomb © 2025 MCDM Productions, LLC
 Dead End (Maneuver) ◆ 2d10 + 2
 Keywords Area, Weapon
 Distance Melee 1 (Special) Target 1 creature or object

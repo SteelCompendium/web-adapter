@@ -6,7 +6,7 @@ class DrawSteelAdapter extends BaseAdapter {
 	}
 
 	parse(text) {
-		const lines = text.split(/\r?\n/).map(l => l.trim());
+		const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => !l.includes("MCDM Productions"));
 		let idx = 0;
 
 		// skip any leading blank lines
