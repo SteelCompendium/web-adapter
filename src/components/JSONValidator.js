@@ -21,14 +21,14 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import validator from "../validation/validator";
+import { validator } from "steel-compendium-sdk";
 
 const JSONValidator = ({ onValidData }) => {
 	const [jsonInput, setJsonInput] = useState("");
 	const [validationResult, setValidationResult] = useState(null);
 	const [isValidating, setIsValidating] = useState(false);
 
-	const handleValidate = () => {
+	const handleValidate = async () => {
 		if (!jsonInput.trim()) {
 			setValidationResult({
 				valid: false,
@@ -40,8 +40,8 @@ const JSONValidator = ({ onValidData }) => {
 		setIsValidating(true);
 
 		// Use setTimeout to allow UI to update
-		setTimeout(() => {
-			const result = validator.validateJSON(jsonInput);
+		setTimeout(async () => {
+			const result = await validator.validateJSON(jsonInput);
 			setValidationResult(result);
 			setIsValidating(false);
 

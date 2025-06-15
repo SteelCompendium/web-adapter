@@ -15,7 +15,7 @@ import {
 	Tabs,
 	Tab,
 } from "@mui/material";
-import adapterRegistry from "./adapters/AdapterRegistry";
+import { adapterRegistry } from "steel-compendium-sdk";
 import JSONValidator from "./components/JSONValidator";
 
 function TabPanel({ children, value, index, sx, ...other }) {
@@ -62,10 +62,10 @@ function App() {
 		setAvailableFormats(adapterRegistry.getAvailableFormats());
 	}, []);
 
-	const handleConvert = () => {
+	const handleConvert = async () => {
 		try {
 			setError("");
-			const result = adapterRegistry.convert(inputText, sourceFormat, targetFormat);
+			const result = await adapterRegistry.convert(inputText, sourceFormat, targetFormat);
 			setOutputText(result);
 		} catch (err) {
 			setError(err.message);
