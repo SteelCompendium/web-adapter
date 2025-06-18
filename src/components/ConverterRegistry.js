@@ -16,7 +16,7 @@ class ConverterRegistry {
 	}
 
 	registerDefaultReadersAndWriters() {
-		this.registerReader("Draw Steel Creature Statblock", new PrereleasePdfStatblockReader());
+		this.registerReader("Prerelease PDF Statblock Text", new PrereleasePdfStatblockReader());
 		this.registerReader("JSON", new JsonReader());
 		this.registerReader("YAML", new YamlReader());
 
