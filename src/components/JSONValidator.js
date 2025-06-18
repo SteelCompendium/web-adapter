@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
 	Box,
@@ -16,6 +16,10 @@ import {
 	ListItemText,
 	Divider,
 	Grid,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -27,6 +31,12 @@ const JSONValidator = ({ onValidData }) => {
 	const [jsonInput, setJsonInput] = useState("");
 	const [validationResult, setValidationResult] = useState(null);
 	const [isValidating, setIsValidating] = useState(false);
+	const [availableSchemas, setAvailableSchemas] = useState([]);
+	const [selectedSchema, setSelectedSchema] = useState("statblock.schema.json");
+
+	useEffect(() => {
+		setAvailableSchemas(validator.getAvailableSchemas());
+	}, []);
 
 	const handleValidate = async () => {
 		if (!jsonInput.trim()) {
@@ -41,7 +51,7 @@ const JSONValidator = ({ onValidData }) => {
 
 		// Use setTimeout to allow UI to update
 		setTimeout(async () => {
-			const result = await validator.validateJSON(jsonInput);
+			const result = await validator.validateJSON(jsonInput, selectedSchema);
 			setValidationResult(result);
 			setIsValidating(false);
 
@@ -106,6 +116,20 @@ const JSONValidator = ({ onValidData }) => {
 					<Typography variant="h6">
 						JSON Input
 					</Typography>
+					<FormControl fullWidth sx={{ my: 2 }}>
+						<InputLabel>Schema</InputLabel>
+						<Select
+							value={selectedSchema}
+							label="Schema"
+							onChange={(e) => setSelectedSchema(e.target.value)}
+						>
+							{availableSchemas.map((schema) => (
+								<MenuItem key={schema} value={schema}>
+									{schema}
+								</MenuItem>
+							))}
+						</Select>
+					</FormControl>
 					<Typography variant="body2" color="text.secondary">
 						Validate your JSON against the Draw Steel statblock schema.
 					</Typography>

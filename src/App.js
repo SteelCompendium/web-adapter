@@ -15,7 +15,7 @@ import {
 	Tabs,
 	Tab,
 } from "@mui/material";
-import { adapterRegistry } from "steel-compendium-sdk";
+import converterRegistry from "./components/ConverterRegistry";
 import JSONValidator from "./components/JSONValidator";
 
 function TabPanel({ children, value, index, sx, ...other }) {
@@ -55,17 +55,19 @@ function App() {
 	const [sourceFormat, setSourceFormat] = useState("Draw Steel Creature Statblock");
 	const [targetFormat, setTargetFormat] = useState("YAML");
 	const [error, setError] = useState("");
-	const [availableFormats, setAvailableFormats] = useState([]);
+	const [availableReaderFormats, setAvailableReaderFormats] = useState([]);
+	const [availableWriterFormats, setAvailableWriterFormats] = useState([]);
 	const [tabValue, setTabValue] = useState(0);
 
 	useEffect(() => {
-		setAvailableFormats(adapterRegistry.getAvailableFormats());
+		setAvailableReaderFormats(converterRegistry.getAvailableReaderFormats());
+		setAvailableWriterFormats(converterRegistry.getAvailableWriterFormats());
 	}, []);
 
 	const handleConvert = async () => {
 		try {
 			setError("");
-			const result = await adapterRegistry.convert(inputText, sourceFormat, targetFormat);
+			const result = await converterRegistry.convert(inputText, sourceFormat, targetFormat);
 			setOutputText(result);
 		} catch (err) {
 			setError(err.message);
@@ -118,7 +120,7 @@ function App() {
 										label="Source Format"
 										onChange={(e) => setSourceFormat(e.target.value)}
 									>
-										{availableFormats.map((format) => (
+										{availableReaderFormats.map((format) => (
 											<MenuItem key={format} value={format}>
 												{format}
 											</MenuItem>
@@ -146,7 +148,7 @@ function App() {
 										label="Target Format"
 										onChange={(e) => setTargetFormat(e.target.value)}
 									>
-										{adapterRegistry.getAvailableFormats(true).map((format) => (
+										{availableWriterFormats.map((format) => (
 											<MenuItem key={format} value={format}>
 												{format}
 											</MenuItem>
