@@ -3,7 +3,7 @@ import {
 	JsonWriter,
 	YamlReader,
 	YamlWriter,
-	MarkdownAbilityWriter,
+	// MarkdownAbilityWriter,
 	PrereleasePdfStatblockReader,
 	validator,
 } from "steel-compendium-sdk";
@@ -22,7 +22,7 @@ class ConverterRegistry {
 
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
-		this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
+		// this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
 	}
 
 	registerReader(name, reader) {

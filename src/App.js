@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import converterRegistry from "./components/ConverterRegistry";
 import JSONValidator from "./components/JSONValidator";
+import BulkConverter from "./components/BulkConverter";
 
 function TabPanel({ children, value, index, sx, ...other }) {
 	return (
@@ -99,6 +100,7 @@ function App() {
 				<Tabs value={tabValue} onChange={handleTabChange} aria-label="converter tabs">
 					<Tab label="Draw Steel Statblock Converter" />
 					<Tab label="Statblock Validator" />
+					<Tab label="Bulk Converter" />
 				</Tabs>
 			</Box>
 
@@ -246,6 +248,9 @@ function App() {
 
 				<TabPanel value={tabValue} index={1}>
 					<JSONValidator onValidData={handleValidData} />
+				</TabPanel>
+				<TabPanel value={tabValue} index={2}>
+					<BulkConverter />
 				</TabPanel>
 			</Box>
 		</Container>

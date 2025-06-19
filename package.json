@@ -1,6 +1,6 @@
 {
   "name": "statblock-adapter-gl-pages",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A web-based tool for converting tabletop RPG statblocks between different formats",
   "main": "src/index.js",
   "scripts": {
@@ -35,15 +35,19 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.17.1",
     "@mui/material": "^5.13.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
-    "steel-compendium-sdk": "0.0.6"
+    "steel-compendium-sdk": "0.0.6",
+    "web-vitals": "^2.1.4",
+    "yaml": "^2.4.2"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "eslint": "^8.57.1",
+    "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.37.5",
     "gh-pages": "^5.0.0"
   },
