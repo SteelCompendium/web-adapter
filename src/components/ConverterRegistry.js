@@ -5,6 +5,7 @@ import {
 	YamlWriter,
 	// MarkdownAbilityWriter,
 	PrereleasePdfStatblockReader,
+	PrereleasePdfAbilityReader,
 	validator,
 } from "steel-compendium-sdk";
 
@@ -17,6 +18,7 @@ class ConverterRegistry {
 
 	registerDefaultReadersAndWriters() {
 		this.registerReader("Prerelease PDF Statblock Text", new PrereleasePdfStatblockReader());
+		this.registerReader("Prerelease PDF Ability Text", new PrereleasePdfAbilityReader());
 		this.registerReader("JSON", new JsonReader());
 		this.registerReader("YAML", new YamlReader());
 

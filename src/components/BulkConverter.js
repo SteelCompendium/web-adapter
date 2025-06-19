@@ -54,12 +54,12 @@ function BulkConverter() {
 
 	const getFileExtension = (format) => {
 		switch (format.toLowerCase()) {
-			case "json":
-				return "json";
-			case "yaml":
-				return "yaml";
-			default:
-				return "txt";
+		case "json":
+			return "json";
+		case "yaml":
+			return "yaml";
+		default:
+			return "txt";
 		}
 	};
 
