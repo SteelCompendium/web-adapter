@@ -129,6 +129,24 @@ function BulkConverter() {
 
 	return (
 		<Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+			<Paper sx={{ p: 2, mb: 2 }}>
+				<Typography variant="h6" gutterBottom>
+					Bulk Statblock Converter
+				</Typography>
+				<Typography variant="body1" paragraph>
+					This tool allows for the bulk conversion of statblock files from one format to several others simultaneously.
+				</Typography>
+				<Typography component="div" variant="body2">
+					<strong>How to use:</strong>
+					<ul>
+						<li>Select the format of your input files.</li>
+						<li>Click &quot;Select Files&quot; to choose one or more statblock files from your computer.</li>
+						<li>Check the boxes for all the desired output formats.</li>
+						<li>Click the &quot;Convert&quot; button to begin the conversion process.</li>
+					</ul>
+					Once complete, a zip file containing all the converted statblocks, organized into folders by format, will be automatically downloaded.
+				</Typography>
+			</Paper>
 			<Grid container spacing={2}>
 				<Grid item xs={12} md={6}>
 					<Paper sx={{ p: 2, height: "100%" }}>
@@ -147,7 +165,7 @@ function BulkConverter() {
 							</Select>
 						</FormControl>
 						<Button variant="contained" component="label">
-                            Select Files
+							Select Files
 							<input type="file" hidden multiple onChange={handleFileSelect} />
 						</Button>
 						<Box sx={{ mt: 2, maxHeight: "300px", overflowY: "auto" }}>
