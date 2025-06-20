@@ -18,6 +18,7 @@ import {
 import converterRegistry from "./components/ConverterRegistry";
 import JSONValidator from "./components/JSONValidator";
 import BulkConverter from "./components/BulkConverter";
+import Extractor from "./components/Extractor";
 
 function TabPanel({ children, value, index, sx, ...other }) {
 	return (
@@ -100,6 +101,7 @@ function App() {
 				<Tabs value={tabValue} onChange={handleTabChange} aria-label="converter tabs">
 					<Tab label="Draw Steel Converter" />
 					<Tab label="Bulk Converter" />
+					<Tab label="Extractor" />
 					<Tab label="Validator" />
 				</Tabs>
 			</Box>
@@ -250,6 +252,9 @@ function App() {
 					<BulkConverter />
 				</TabPanel>
 				<TabPanel value={tabValue} index={2}>
+					<Extractor />
+				</TabPanel>
+				<TabPanel value={tabValue} index={3}>
 					<JSONValidator onValidData={handleValidData} />
 				</TabPanel>
 			</Box>

@@ -6,6 +6,7 @@ import {
 	// MarkdownAbilityWriter,
 	PrereleasePdfStatblockReader,
 	PrereleasePdfAbilityReader,
+	PrereleasePdfStatblockExtractor,
 	validator,
 	Statblock,
 	Ability,
@@ -16,6 +17,7 @@ class ConverterRegistry {
 	constructor() {
 		this.readers = new Map();
 		this.writers = new Map();
+		this.extractors = new Map();
 		this.registerDefaultReadersAndWriters();
 	}
 
@@ -31,6 +33,8 @@ class ConverterRegistry {
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
 		// this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
+
+		this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());
 	}
 
 	registerReader(name, reader) {
@@ -39,6 +43,10 @@ class ConverterRegistry {
 
 	registerWriter(name, writer) {
 		this.writers.set(name, writer);
+	}
+
+	registerExtractor(name, extractor) {
+		this.extractors.set(name, extractor);
 	}
 
 	getReader(name) {
@@ -57,6 +65,14 @@ class ConverterRegistry {
 		return writer;
 	}
 
+	getExtractor(name) {
+		const extractor = this.extractors.get(name);
+		if (!extractor) {
+			throw new Error(`No extractor found for format: ${name}`);
+		}
+		return extractor;
+	}
+
 	getAvailableReaderFormats() {
 		return Array.from(this.readers.keys());
 	}
@@ -65,13 +81,16 @@ class ConverterRegistry {
 		return Array.from(this.writers.keys());
 	}
 
+	getAvailableExtractorFormats() {
+		return Array.from(this.extractors.keys());
+	}
+
 	convert(text, sourceFormat, targetFormat) {
 		const sourceReader = this.getReader(sourceFormat);
-		const targetWriter = this.getWriter(targetFormat);
 
 		const standardizedStatblock = sourceReader.read(text);
 
-		const result = targetWriter.write(standardizedStatblock);
+		const result = this.write(standardizedStatblock, targetFormat);
 
 		if (targetFormat.toLowerCase().includes("json") || this.isJSONFormat(result)) {
 			try {
@@ -88,6 +107,16 @@ class ConverterRegistry {
 		}
 
 		return result;
+	}
+
+	extract(text, extractorFormat) {
+		const extractor = this.getExtractor(extractorFormat);
+		return extractor.extract(text);
+	}
+
+	write(model, targetFormat) {
+		const targetWriter = this.getWriter(targetFormat);
+		return targetWriter.write(model);
 	}
 
 	isJSONFormat(text) {
