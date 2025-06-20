@@ -20,7 +20,7 @@ class ConverterRegistry {
 	}
 
 	registerDefaultReadersAndWriters() {
-		this.registerReader("YOLO Magic", new AutoDataReader());
+		this.registerReader("Automagically Identify Input Format", new AutoDataReader());
 		this.registerReader("Prerelease PDF Statblock Text", new PrereleasePdfStatblockReader());
 		this.registerReader("Statblock JSON", new JsonReader(Statblock.modelDTOAdapter));
 		this.registerReader("Statblock YAML", new YamlReader(Statblock.modelDTOAdapter));

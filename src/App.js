@@ -53,7 +53,7 @@ TabPanel.propTypes = {
 function App() {
 	const [inputText, setInputText] = useState("");
 	const [outputText, setOutputText] = useState("");
-	const [sourceFormat, setSourceFormat] = useState("YOLO Magic");
+	const [sourceFormat, setSourceFormat] = useState("Automagically Identify Input Format");
 	const [targetFormat, setTargetFormat] = useState("YAML");
 	const [error, setError] = useState("");
 	const [availableReaderFormats, setAvailableReaderFormats] = useState([]);
