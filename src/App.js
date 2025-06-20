@@ -247,10 +247,10 @@ function App() {
 				</TabPanel>
 
 				<TabPanel value={tabValue} index={1}>
-					<JSONValidator onValidData={handleValidData} />
+					<BulkConverter />
 				</TabPanel>
 				<TabPanel value={tabValue} index={2}>
-					<BulkConverter />
+					<JSONValidator onValidData={handleValidData} />
 				</TabPanel>
 			</Box>
 		</Container>
