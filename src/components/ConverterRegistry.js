@@ -7,6 +7,8 @@ import {
 	PrereleasePdfStatblockReader,
 	PrereleasePdfAbilityReader,
 	validator,
+	Statblock,
+	Ability,
 } from "steel-compendium-sdk";
 
 class ConverterRegistry {
@@ -18,9 +20,11 @@ class ConverterRegistry {
 
 	registerDefaultReadersAndWriters() {
 		this.registerReader("Prerelease PDF Statblock Text", new PrereleasePdfStatblockReader());
+		this.registerReader("Statblock JSON", new JsonReader(Statblock.modelDTOAdapter));
+		this.registerReader("Statblock YAML", new YamlReader(Statblock.modelDTOAdapter));
 		this.registerReader("Prerelease PDF Ability Text", new PrereleasePdfAbilityReader());
-		this.registerReader("JSON", new JsonReader());
-		this.registerReader("YAML", new YamlReader());
+		this.registerReader("Ability JSON", new JsonReader(Ability.modelDTOAdapter));
+		this.registerReader("Ability YAML", new YamlReader(Ability.modelDTOAdapter));
 
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
