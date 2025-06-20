@@ -98,9 +98,9 @@ function App() {
 
 			<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
 				<Tabs value={tabValue} onChange={handleTabChange} aria-label="converter tabs">
-					<Tab label="Draw Steel Statblock Converter" />
-					<Tab label="Statblock Validator" />
+					<Tab label="Draw Steel Converter" />
 					<Tab label="Bulk Converter" />
+					<Tab label="Validator" />
 				</Tabs>
 			</Box>
 
