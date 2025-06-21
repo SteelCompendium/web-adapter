@@ -1,6 +1,6 @@
-# Statblock Adapter
+# Statblock Converter
 
-A web-based tool for converting tabletop RPG statblocks between different formats. Paste a statblock on the left, select your desired output format, and get the converted result on the right.
+A web-based tool for converting tabletop RPG statblocks and abilities between different formats. It can also extract entities from unstructured text, and bulk-process files.
 
 ## 🚀 Live Demo
 
@@ -8,34 +8,17 @@ Visit the live application at: https://steelcompendium.github.io/web-adapter/
 
 ## 🎯 Features
 
-- **Multiple Input/Output Formats**: Supports "Draw Steel", JSON, YAML, and Markdown.
+- **Flexible I/O**: Supports multiple formats for reading and writing.
+    - **Input Formats**: Automatically detect, Prerelease PDF Text, JSON, and YAML.
+    - **Output Formats**: JSON and YAML.
+- **Statblock and Ability Extraction**: Pulls statblocks directly from unstructured Prerelease PDF text.
+- **Bulk Conversion**: Upload multiple files and convert them to various formats simultaneously, conveniently bundled into a zip file.
 - **Modern UI**: Clean, responsive interface built with React and Material-UI.
-- **Real-time Conversion**: Instantly see the converted output as you type.
+- **Real-time Conversion**: Instantly see the converted output as you type in the main editor.
 - **Copy to Clipboard**: Easily copy the converted statblock.
-- **Schema Validation**: Converted JSON is validated against a schema.
+- **Schema Validation**: Converted JSON is validated against the official `steel-compendium-sdk` schema.
 
 ## 🛠️ Development
-
-### Project Structure
-
-```
-.
-├── .github/
-│   └── workflows/
-│       └── deploy.yml        # GitHub Actions CI/CD for deploying to GitHub Pages
-├── build/                    # The output of the build process, deployed to GitHub pages
-├── public/
-│   └── index.html            # Main application shell
-├── src/
-│   ├── adapters/             # Contains the logic for parsing and formatting statblocks
-│   ├── components/           # React components for the UI
-│   ├── schema/               # JSON schema definitions for statblock data
-│   ├── validation/           # Validation logic using the schemas
-│   ├── App.js                # Main application component
-│   └── index.js              # Entry point for the React application
-├── package.json
-└── README.md
-```
 
 ### Local Development
 
@@ -43,8 +26,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/SteelCompendium/statblock-adapter-gl-pages.git
-    cd statblock-adapter-gl-pages
+    git clone https://github.com/SteelCompendium/web-adapter.git
+    cd web-adapter
     ```
 
 2.  **Install dependencies:**
@@ -66,95 +49,67 @@ npm run build
 ```
 This builds the app for production to the `build` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
 
-## 🔧 Architecture
+## 🔧 Architecture & Core Concepts
 
-The conversion logic is built on an **Adapter Pattern**. This makes it easy to add support for new statblock formats.
+The conversion logic is powered by the [**steel-compendium-sdk**](https://github.com/SteelCompendium/steel-compendium-sdk), which provides a standardized way to work with statblock and ability data. This makes it easy to add support for new formats.
 
 ### Core Components
 
--   `AdapterRegistry`: A singleton that manages all the available adapters. It's responsible for orchestrating the conversion process by selecting the correct source and target adapters.
--   `BaseAdapter`: An abstract base class that defines the interface for all adapters. Each adapter must implement `parse()`, `format()`, and `getName()`.
--   **Adapters** (e.g., `DrawSteelAdapter`, `JsonAdapter`): Concrete implementations of `BaseAdapter`. Each adapter handles a specific statblock format.
+-   `ConverterRegistry`: A singleton that manages all available Readers, Writers, and Extractors. It orchestrates the conversion process.
+-   **Readers**: Classes that parse input text from a specific format (e.g., `PrereleasePdfStatblockReader`, `JsonReader`) into a standardized JavaScript object defined by the SDK.
+-   **Writers**: Classes that format a standardized JavaScript object into a specific output string (e.g., `JsonWriter`, `YamlWriter`).
+-   **Extractors**: Classes that find and parse entities from larger bodies of unstructured text (e.g., `PrereleasePdfStatblockExtractor`).
 
 ### Conversion Flow
 
-1.  The UI calls the `AdapterRegistry.convert()` method with the input text, source format, and target format.
-2.  The `AdapterRegistry` retrieves the appropriate source and target adapter.
-3.  The source adapter's `parse()` method is called to convert the input text into a standardized JavaScript object.
-4.  The target adapter's `format()` method is called with the standardized object to produce the final output string.
-5.  If the output is JSON, it is validated against the official schema.
+1.  The UI calls the `ConverterRegistry` with the input text, source format, and target format.
+2.  The `ConverterRegistry` selects the correct **Reader** to parse the text into a standardized model object.
+3.  The `ConverterRegistry` then uses the appropriate **Writer** to format the object into the target output string.
+4.  If the output is JSON, it is validated against the official SDK schema.
 
 ## 📝 Data Format
 
-The internal standardized data structure used between parsing and formatting is based on the JSON Schema defined in `src/schema/statblock.schema.json`. This ensures consistency and allows for validation.
+The internal standardized data structure used for statblocks and abilities is defined and managed by the `steel-compendium-sdk`. This ensures consistency, enables validation, and allows for seamless interoperability between different formats.
 
-Here is a simplified view of the main properties:
-
-```javascript
-{
-  "name": "string",
-  "level": "integer",
-  "roles": ["string"],
-  "ancestry": ["string"],
-  "ev": "string",
-  "stamina": "integer",
-  "speed": "string",
-  "size": "string",
-  "stability": "integer",
-  "free_strike": "integer",
-  "might": "integer",
-  "agility": "integer",
-  "reason": "integer",
-  "intuition": "integer",
-  "presence": "integer",
-  "traits": [/* ... */],
-  "abilities": [/* ... */]
-}
-```
-For the complete and detailed schema, please refer to `src/schema/statblock.schema.json` and `src/schema/ability.schema.json`.
+For details on the data model, please refer to the `steel-compendium-sdk` documentation.
 
 ## 🧩 Adding New Formats
 
-To add support for a new format, you need to create a new adapter class.
+To add support for a new format, you need to create a new Reader or Writer class and register it. While the core classes are in the SDK, you can register new ones within this project.
 
-1.  **Create the Adapter Class**:
-    Create a new file in `src/adapters/`, for example `MyFormatAdapter.js`. The class must extend `BaseAdapter` and implement the `getName()`, `parse()`, and `format()` methods.
+1.  **Create the Reader/Writer Class**:
+    Your new class should conform to the Reader or Writer interface expected by the `ConverterRegistry`.
 
     ```javascript
-    import BaseAdapter from './BaseAdapter';
-
-    class MyFormatAdapter extends BaseAdapter {
-      getName() {
-        return 'My Format';
-      }
-
-      parse(text) {
+    class MyFormatReader {
+      read(text) {
         // Convert the input text into the standardized statblock object
         const statblock = { /* ... */ };
         return statblock;
       }
+    }
 
-      format(statblock) {
+    class MyFormatWriter {
+      write(statblock) {
         // Convert the standardized statblock object into a string
         return '...formatted string...';
       }
     }
-
-    export default MyFormatAdapter;
     ```
 
-2.  **Register the Adapter**:
-    In `src/adapters/AdapterRegistry.js`, import your new adapter and register it in the `registerDefaultAdapters` method.
+2.  **Register the new class**:
+    In `src/components/ConverterRegistry.js`, import your new class and register an instance of it in the `registerDefaultReadersAndWriters` method.
 
     ```javascript
-    // src/adapters/AdapterRegistry.js
-    import MyFormatAdapter from './MyFormatAdapter';
+    // src/components/ConverterRegistry.js
+    import { MyFormatReader, MyFormatWriter } from './my-format-sdk-extension'; // or wherever it's defined
 
-    class AdapterRegistry {
+    class ConverterRegistry {
       // ...
-      registerDefaultAdapters() {
+      registerDefaultReadersAndWriters() {
         // ...
-        this.registerAdapter(new MyFormatAdapter());
+        this.registerReader("My Awesome Format", new MyFormatReader());
+        this.registerWriter("My Awesome Format", new MyFormatWriter());
       }
       // ...
     }
@@ -173,4 +128,4 @@ Contributions are welcome! Please follow these steps:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
