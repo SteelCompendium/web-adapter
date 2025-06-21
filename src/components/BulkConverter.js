@@ -22,7 +22,7 @@ import converterRegistry from "./ConverterRegistry";
 
 function BulkConverter() {
 	const [selectedFiles, setSelectedFiles] = useState([]);
-	const [sourceFormat, setSourceFormat] = useState("Prerelease PDF Statblock Text");
+	const [sourceFormat, setSourceFormat] = useState("Automagically Identify Input Format");
 	const [targetFormats, setTargetFormats] = useState({});
 	const [availableReaderFormats, setAvailableReaderFormats] = useState([]);
 	const [availableWriterFormats, setAvailableWriterFormats] = useState([]);
@@ -131,20 +131,20 @@ function BulkConverter() {
 		<Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
 			<Paper sx={{ p: 2, mb: 2 }}>
 				<Typography variant="h6" gutterBottom>
-					Bulk Statblock Converter
+					Bulk Converter
 				</Typography>
 				<Typography variant="body1" paragraph>
-					This tool allows for the bulk conversion of statblock files from one format to several others simultaneously.
+					This tool allows for the bulk conversion of ability and statblock files from one format to several others simultaneously.
 				</Typography>
 				<Typography component="div" variant="body2">
 					<strong>How to use:</strong>
 					<ul>
-						<li>Select the format of your input files.</li>
-						<li>Click &quot;Select Files&quot; to choose one or more statblock files from your computer.</li>
+						<li>Select the format of your input files. Note: The input format must all match the files selected (unless using the automatic format)</li>
+						<li>Click &quot;Select Files&quot; to choose one or more ability or statblock files from your computer.</li>
 						<li>Check the boxes for all the desired output formats.</li>
 						<li>Click the &quot;Convert&quot; button to begin the conversion process.</li>
 					</ul>
-					Once complete, a zip file containing all the converted statblocks, organized into folders by format, will be automatically downloaded.
+					Once complete, a zip file containing all the converted abilities and statblocks, organized into folders by format, will be automatically downloaded.
 				</Typography>
 			</Paper>
 			<Grid container spacing={2}>
