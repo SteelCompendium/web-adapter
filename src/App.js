@@ -96,16 +96,45 @@ function App() {
 				height: "100vh",
 			}}
 		>
-
-			<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-				<Tabs value={tabValue} onChange={handleTabChange} aria-label="converter tabs">
-					<Tab label="Draw Steel Converter" />
-					<Tab label="Bulk Converter" />
-					<Tab label="Extractor" />
-					<Tab label="Validator" />
-				</Tabs>
-			</Box>
-
+			<Container
+				sx={{
+					display: "flex",
+					alignItems: "left",
+					margin: "0",
+				}}
+			>
+				<a
+					href="https://steelcompendium.io"
+					target="_blank"
+					rel="noopener noreferrer"
+					style={{
+						top: "10px",
+						left: "10px",
+						zIndex: 1300,
+						paddingRight: "1rem",
+					}}
+				>
+					<img
+						src={`${process.env.PUBLIC_URL}/steel_compendium_glow@512.png`}
+						alt="Steel Compendium Logo"
+						style={{
+							height: "40px",
+						}}
+					/>
+				</a>
+				<Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+					<Tabs
+						value={tabValue}
+						onChange={handleTabChange}
+						aria-label="converter tabs"
+					>
+						<Tab label="Draw Steel Converter" />
+						<Tab label="Bulk Converter" />
+						<Tab label="Extractor" />
+						<Tab label="Validator" />
+					</Tabs>
+				</Box>
+			</Container>
 			<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
 				<TabPanel value={tabValue} index={0} sx={{ height: "100%" }}>
 					{error && (
