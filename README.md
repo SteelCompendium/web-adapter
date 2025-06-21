@@ -4,7 +4,7 @@ A web-based tool for converting Draw Steel TTRPG statblocks and abilities betwee
 
 ## 🚀 Live Site
 
-Visit the live application at: https://steelcompendium.github.io/web-adapter/
+Visit the live application at: https://steelcompendium.io/web-adapter/
 
 ## ✨ Features
 
