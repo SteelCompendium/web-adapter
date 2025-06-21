@@ -227,7 +227,7 @@ function App() {
 										multiline
 										value={inputText}
 										onChange={(e) => setInputText(e.target.value)}
-										placeholder="Paste your statblock here..."
+										placeholder="Paste your ability or statblock here..."
 									/>
 								</Box>
 							</Paper>
@@ -269,7 +269,7 @@ function App() {
 										InputProps={{
 											readOnly: true,
 										}}
-										placeholder="Converted statblock will appear here..."
+										placeholder="Converted ability or statblock will appear here..."
 									/>
 								</Box>
 							</Paper>
