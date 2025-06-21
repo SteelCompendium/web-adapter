@@ -30,6 +30,7 @@ function Extractor() {
 	const [availableWriterFormats, setAvailableWriterFormats] = useState([]);
 	const [isExtracting, setIsExtracting] = useState(false);
 	const [progress, setProgress] = useState({});
+	const [extractionStep, setExtractionStep] = useState("");
 
 	useEffect(() => {
 		const extractors = converterRegistry.getAvailableExtractorFormats();
@@ -76,52 +77,58 @@ function Extractor() {
 		}
 	};
 
-	const handleExtract = async () => {
+	const handleExtract = () => {
 		setIsExtracting(true);
+		setExtractionStep("extracting");
+		setProgress({});
 		const selectedWriterFormats = Object.keys(targetFormats).filter((format) => targetFormats[format]);
 
-		try {
-			const statblocks = await converterRegistry.extract(inputText, sourceExtractor);
+		setTimeout(async () => {
+			try {
+				const statblocks = await converterRegistry.extract(inputText, sourceExtractor);
 
-			const initialProgress = selectedWriterFormats.reduce((acc, format) => {
-				acc[format] = { value: 0, total: statblocks.length };
-				return acc;
-			}, {});
-			setProgress(initialProgress);
+				setExtractionStep("writing");
+				const initialProgress = selectedWriterFormats.reduce((acc, format) => {
+					acc[format] = { value: 0, total: statblocks.length };
+					return acc;
+				}, {});
+				setProgress(initialProgress);
 
-			const zip = new JSZip();
+				const zip = new JSZip();
 
-			for (const format of selectedWriterFormats) {
-				const formatFolder = zip.folder(format.toLowerCase());
-				for (const statblock of statblocks) {
-					try {
-						const outputText = await converterRegistry.write(statblock, format);
-						const outputFileName = `${statblock.name.replace(/\s+/g, "_")}.${getFileExtension(format)}`;
-						formatFolder.file(outputFileName, outputText);
-					} catch (err) {
-						// eslint-disable-next-line no-console
-						console.error(`Error converting ${statblock.name} to ${format}:`, err);
-						formatFolder.file(`${statblock.name}.error.log`, `Conversion failed: ${err.message}`);
-					} finally {
-						setProgress((prev) => {
-							const newProgress = { ...prev };
-							newProgress[format] = { ...newProgress[format], value: newProgress[format].value + 1 };
-							return newProgress;
-						});
+				for (const format of selectedWriterFormats) {
+					const formatFolder = zip.folder(format.toLowerCase());
+					for (const statblock of statblocks) {
+						try {
+							const outputText = await converterRegistry.write(statblock, format);
+							const outputFileName = `${statblock.name.replace(/\s+/g, "_")}.${getFileExtension(format)}`;
+							formatFolder.file(outputFileName, outputText);
+						} catch (err) {
+							// eslint-disable-next-line no-console
+							console.error(`Error converting ${statblock.name} to ${format}:`, err);
+							formatFolder.file(`${statblock.name}.error.log`, `Conversion failed: ${err.message}`);
+						} finally {
+							setProgress((prev) => {
+								const newProgress = { ...prev };
+								newProgress[format] = { ...newProgress[format], value: newProgress[format].value + 1 };
+								return newProgress;
+							});
+						}
 					}
 				}
-			}
 
-			zip.generateAsync({ type: "blob" }).then((content) => {
-				saveAs(content, "extracted-statblocks.zip");
-			});
-		} catch (err) {
-			// eslint-disable-next-line no-console
-			console.error("Error extracting from source:", err);
-			// Maybe show an error to the user
-		} finally {
-			setIsExtracting(false);
-		}
+				zip.generateAsync({ type: "blob" }).then((content) => {
+					saveAs(content, "extracted-statblocks.zip");
+				});
+			} catch (err) {
+				// eslint-disable-next-line no-console
+				console.error("Error extracting from source:", err);
+				// Maybe show an error to the user
+			} finally {
+				setIsExtracting(false);
+				setExtractionStep("");
+			}
+		}, 0);
 	};
 
 	const selectedWriterFormats = Object.keys(targetFormats).filter((format) => targetFormats[format]);
@@ -130,10 +137,10 @@ function Extractor() {
 		<Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
 			<Paper sx={{ p: 2, mb: 2 }}>
 				<Typography variant="h6" gutterBottom>
-                    Statblock Extractor
+					Statblock Extractor
 				</Typography>
 				<Typography variant="body1" paragraph>
-                    This tool allows for extracting multiple statblocks from a single text source and converting them to several other formats simultaneously.
+					This tool allows for extracting multiple statblocks from a single text source and converting them to several other formats simultaneously.
 				</Typography>
 				<Typography component="div" variant="body2">
 					<strong>How to use:</strong>
@@ -143,7 +150,7 @@ function Extractor() {
 						<li>Check the boxes for all the desired output formats.</li>
 						<li>Click the &quot;Extract and Convert&quot; button to begin.</li>
 					</ul>
-                    Once complete, a zip file containing all the converted statblocks, organized into folders by format, will be automatically downloaded.
+					Once complete, a zip file containing all the converted statblocks, organized into folders by format, will be automatically downloaded.
 				</Typography>
 			</Paper>
 			<Grid container spacing={2}>
@@ -164,7 +171,7 @@ function Extractor() {
 							</Select>
 						</FormControl>
 						<Button variant="contained" component="label" sx={{ mb: 2 }}>
-                            Select File
+							Select File
 							<input type="file" hidden onChange={handleFileSelect} />
 						</Button>
 						{selectedFile && <Chip label={selectedFile.name} sx={{ m: 0.5, mb: 2 }} onDelete={() => { setSelectedFile(null); setInputText(""); }} />}
@@ -217,7 +224,13 @@ function Extractor() {
 			{isExtracting && (
 				<Paper sx={{ p: 2, mt: 2, flexGrow: 1, overflowY: "auto" }}>
 					<Typography variant="h6">Conversion Progress</Typography>
-					{selectedWriterFormats.map((format) => (
+					{extractionStep === "extracting" && (
+						<Box sx={{ mt: 2 }}>
+							<Typography>Extracting statblocks from source...</Typography>
+							<LinearProgress />
+						</Box>
+					)}
+					{extractionStep === "writing" && selectedWriterFormats.map((format) => (
 						<Box key={format} sx={{ mt: 2 }}>
 							<Typography>{format}</Typography>
 							<LinearProgress
