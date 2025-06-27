@@ -20,6 +20,24 @@ import JSONValidator from "./components/JSONValidator";
 import BulkConverter from "./components/BulkConverter";
 import Extractor from "./components/Extractor";
 
+const textAreaStyle = {
+	position: "absolute",
+	top: 0,
+	left: 0,
+	width: "100%",
+	height: "100%",
+	"& .MuiInputBase-root": {
+		height: "100%",
+		alignItems: "flex-start",
+	},
+	"& textarea": {
+		height: "100% !important",
+		overflowY: "auto !important",
+		boxSizing: "border-box",
+		fontFamily: "monospace",
+	},
+};
+
 function TabPanel({ children, value, index, sx, ...other }) {
 	return (
 		<Box
@@ -208,22 +226,7 @@ function App() {
 									position: "relative",
 								}}>
 									<TextField
-										sx={{
-											position: "absolute",
-											top: 0,
-											left: 0,
-											width: "100%",
-											height: "100%",
-											"& .MuiInputBase-root": {
-												height: "100%",
-												alignItems: "flex-start",
-											},
-											"& textarea": {
-												height: "100% !important",
-												overflowY: "auto !important",
-												boxSizing: "border-box",
-											},
-										}}
+										sx={textAreaStyle}
 										multiline
 										value={inputText}
 										onChange={(e) => setInputText(e.target.value)}
@@ -248,22 +251,7 @@ function App() {
 									position: "relative",
 								}}>
 									<TextField
-										sx={{
-											position: "absolute",
-											top: 0,
-											left: 0,
-											width: "100%",
-											height: "100%",
-											"& .MuiInputBase-root": {
-												height: "100%",
-												alignItems: "flex-start",
-											},
-											"& textarea": {
-												height: "100% !important",
-												overflowY: "auto !important",
-												boxSizing: "border-box",
-											},
-										}}
+										sx={textAreaStyle}
 										multiline
 										value={outputText}
 										InputProps={{
