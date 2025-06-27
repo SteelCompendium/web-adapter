@@ -1,5 +1,5 @@
 run:
-    DISABLED_ESLINT_PLUGIN=true npm run start
+    npm install && npx eslint . --fix && DISABLED_ESLINT_PLUGIN=true npm run start
 
 lint:
     npx eslint . --fix

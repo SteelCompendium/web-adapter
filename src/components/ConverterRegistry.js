@@ -3,7 +3,8 @@ import {
 	JsonWriter,
 	YamlReader,
 	YamlWriter,
-	// MarkdownAbilityWriter,
+	MarkdownAbilityWriter,
+	MarkdownAbilityReader,
 	PrereleasePdfStatblockReader,
 	PrereleasePdfAbilityReader,
 	PrereleasePdfStatblockExtractor,
@@ -29,10 +30,11 @@ class ConverterRegistry {
 		this.registerReader("Ability: Prerelease PDF Text", new PrereleasePdfAbilityReader());
 		this.registerReader("Ability: JSON", new JsonReader(Ability.modelDTOAdapter));
 		this.registerReader("Ability: YAML", new YamlReader(Ability.modelDTOAdapter));
+		this.registerReader("Ability: Markdown (Steel Compendium formatted)", new MarkdownAbilityReader());
 
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
-		// this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
+		this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
 
 		this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());
 	}
