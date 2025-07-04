@@ -59,7 +59,7 @@ function BulkConverter() {
 		case "yaml":
 			return "yaml";
 		default:
-			return "txt";
+			return "md";
 		}
 	};
 

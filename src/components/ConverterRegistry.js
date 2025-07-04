@@ -5,6 +5,8 @@ import {
 	YamlWriter,
 	MarkdownAbilityWriter,
 	MarkdownAbilityReader,
+	MarkdownStatblockWriter,
+	MarkdownStatblockReader,
 	PrereleasePdfStatblockReader,
 	PrereleasePdfAbilityReader,
 	PrereleasePdfStatblockExtractor,
@@ -23,19 +25,24 @@ class ConverterRegistry {
 	}
 
 	registerDefaultReadersAndWriters() {
+		// Readers
 		this.registerReader("Automagically Identify Input Format", new AutoDataReader());
-		this.registerReader("Statblock: Prerelease PDF Text", new PrereleasePdfStatblockReader());
 		this.registerReader("Statblock: JSON", new JsonReader(Statblock.modelDTOAdapter));
 		this.registerReader("Statblock: YAML", new YamlReader(Statblock.modelDTOAdapter));
-		this.registerReader("Ability: Prerelease PDF Text", new PrereleasePdfAbilityReader());
+		this.registerReader("Statblock: Markdown (Steel Compendium formatted)", new MarkdownStatblockReader());
+		this.registerReader("Statblock: Prerelease PDF Text", new PrereleasePdfStatblockReader());
 		this.registerReader("Ability: JSON", new JsonReader(Ability.modelDTOAdapter));
 		this.registerReader("Ability: YAML", new YamlReader(Ability.modelDTOAdapter));
 		this.registerReader("Ability: Markdown (Steel Compendium formatted)", new MarkdownAbilityReader());
+		this.registerReader("Ability: Prerelease PDF Text", new PrereleasePdfAbilityReader());
 
+		// Writers
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
 		this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
+		this.registerWriter("Markdown Statblock", new MarkdownStatblockWriter());
 
+		// Extractors
 		this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());
 	}
 
