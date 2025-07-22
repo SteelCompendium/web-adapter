@@ -7,15 +7,14 @@ import {
 	MarkdownAbilityReader,
 	MarkdownStatblockWriter,
 	MarkdownStatblockReader,
-	PrereleasePdfStatblockReader,
-	PrereleasePdfAbilityReader,
 	PrereleasePdfStatblockExtractor,
 	validator,
 	Statblock,
 	Ability,
 	AutoDataReader,
+	XmlAbilityReader,
+	XmlAbilityWriter,
 } from "steel-compendium-sdk";
-import {XmlAbilityReader, XmlAbilityWriter} from "steel-compendium-sdk/src/io/xml";
 
 class ConverterRegistry {
 	constructor() {
@@ -43,9 +42,9 @@ class ConverterRegistry {
 		// TODO - I might want to make a MarkdownWriter that uses the identifier to figure out the datatype
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
-		this.registerWriter("XML Ability", new XmlAbilityWriter());
-		this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
-		this.registerWriter("Markdown Statblock", new MarkdownStatblockWriter());
+		this.registerWriter("Ability: XML", new XmlAbilityWriter());
+		this.registerWriter("Ability: Markdown", new MarkdownAbilityWriter());
+		this.registerWriter("Statblock: Markdown", new MarkdownStatblockWriter());
 
 		// Extractors
 		this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());
