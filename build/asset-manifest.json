@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/web-adapter/static/js/main.e6e12793.js",
+    "main.js": "/web-adapter/static/js/main.63d3d8f6.js",
     "index.html": "/web-adapter/index.html",
-    "main.e6e12793.js.map": "/web-adapter/static/js/main.e6e12793.js.map"
+    "main.63d3d8f6.js.map": "/web-adapter/static/js/main.63d3d8f6.js.map"
   },
   "entrypoints": [
-    "static/js/main.e6e12793.js"
+    "static/js/main.63d3d8f6.js"
   ]
 }
