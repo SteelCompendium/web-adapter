@@ -15,6 +15,7 @@ import {
 	Ability,
 	AutoDataReader,
 } from "steel-compendium-sdk";
+import {XmlAbilityReader, XmlAbilityWriter} from "steel-compendium-sdk/src/io/xml";
 
 class ConverterRegistry {
 	constructor() {
@@ -27,18 +28,22 @@ class ConverterRegistry {
 	registerDefaultReadersAndWriters() {
 		// Readers
 		this.registerReader("Automagically Identify Input Format", new AutoDataReader());
+		this.registerReader("Statblock: Markdown (Steel Compendium formatted)", new MarkdownStatblockReader());
 		this.registerReader("Statblock: JSON", new JsonReader(Statblock.modelDTOAdapter));
 		this.registerReader("Statblock: YAML", new YamlReader(Statblock.modelDTOAdapter));
-		this.registerReader("Statblock: Markdown (Steel Compendium formatted)", new MarkdownStatblockReader());
-		this.registerReader("Statblock: Prerelease PDF Text", new PrereleasePdfStatblockReader());
+		// this.registerReader("Statblock: XML", new YamlReader(Statblock.modelDTOAdapter));
+		// this.registerReader("Statblock: Prerelease PDF Text", new PrereleasePdfStatblockReader());
+		this.registerReader("Ability: Markdown (Steel Compendium formatted)", new MarkdownAbilityReader());
 		this.registerReader("Ability: JSON", new JsonReader(Ability.modelDTOAdapter));
 		this.registerReader("Ability: YAML", new YamlReader(Ability.modelDTOAdapter));
-		this.registerReader("Ability: Markdown (Steel Compendium formatted)", new MarkdownAbilityReader());
-		this.registerReader("Ability: Prerelease PDF Text", new PrereleasePdfAbilityReader());
+		this.registerReader("Ability: XML", new XmlAbilityReader());
+		// this.registerReader("Ability: Prerelease PDF Text", new PrereleasePdfAbilityReader());
 
 		// Writers
+		// TODO - I might want to make a MarkdownWriter that uses the identifier to figure out the datatype
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
+		this.registerWriter("XML Ability", new XmlAbilityWriter());
 		this.registerWriter("Markdown Ability", new MarkdownAbilityWriter());
 		this.registerWriter("Markdown Statblock", new MarkdownStatblockWriter());
 
