@@ -6,6 +6,8 @@ A web-based tool for converting Draw Steel TTRPG statblocks and abilities betwee
 
 Visit the live application at: https://steelcompendium.io/web-adapter/
 
+Please use this [form to report bugs](https://docs.google.com/forms/d/e/1FAIpQLSc6m-pZ0NLt2EArE-Tcxr-XbAPMyhu40ANHJKtyRvvwBd2LSw/viewform?usp=sharing&ouid=105036387964900154878) if you find them!
+
 ## ✨ Features
 
 - **Universal Conversion**: Supports a variety of input and output formats.
