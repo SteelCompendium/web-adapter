@@ -47,7 +47,7 @@ class ConverterRegistry {
 		this.registerWriter("Statblock: Markdown", new MarkdownStatblockWriter());
 
 		// Extractors
-		this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());
+		// this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());
 	}
 
 	registerReader(name, reader) {
