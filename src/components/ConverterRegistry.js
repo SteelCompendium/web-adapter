@@ -7,7 +7,6 @@ import {
 	MarkdownAbilityReader,
 	MarkdownStatblockWriter,
 	MarkdownStatblockReader,
-	PrereleasePdfStatblockExtractor,
 	validator,
 	Statblock,
 	Ability,
