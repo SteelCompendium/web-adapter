@@ -7,12 +7,14 @@ import {
 	MarkdownAbilityReader,
 	MarkdownStatblockWriter,
 	MarkdownStatblockReader,
+	MarkdownFeatureblockWriter,
+	MarkdownFeatureblockReader,
 	validator,
 	Statblock,
 	Ability,
 	AutoDataReader,
 	XmlAbilityReader,
-	XmlAbilityWriter,
+	XmlAbilityWriter, Featureblock,
 } from "steel-compendium-sdk";
 
 class ConverterRegistry {
@@ -26,24 +28,28 @@ class ConverterRegistry {
 	registerDefaultReadersAndWriters() {
 		// Readers
 		this.registerReader("Automagically Identify Input Format", new AutoDataReader());
+
 		this.registerReader("Statblock: Markdown (Steel Compendium formatted)", new MarkdownStatblockReader());
 		this.registerReader("Statblock: JSON", new JsonReader(Statblock.modelDTOAdapter));
 		this.registerReader("Statblock: YAML", new YamlReader(Statblock.modelDTOAdapter));
-		// this.registerReader("Statblock: XML", new YamlReader(Statblock.modelDTOAdapter));
-		// this.registerReader("Statblock: Prerelease PDF Text", new PrereleasePdfStatblockReader());
+
 		this.registerReader("Ability: Markdown (Steel Compendium formatted)", new MarkdownAbilityReader());
 		this.registerReader("Ability: JSON", new JsonReader(Ability.modelDTOAdapter));
 		this.registerReader("Ability: YAML", new YamlReader(Ability.modelDTOAdapter));
 		this.registerReader("Ability: XML", new XmlAbilityReader());
-		// this.registerReader("Ability: Prerelease PDF Text", new PrereleasePdfAbilityReader());
+
+		this.registerReader("Featureblock: Markdown (Steel Compendium formatted)", new MarkdownFeatureblockReader());
+		this.registerReader("Featureblock: JSON", new JsonReader(Featureblock.modelDTOAdapter));
+		this.registerReader("Featureblock: YAML", new YamlReader(Featureblock.modelDTOAdapter));
 
 		// Writers
 		// TODO - I might want to make a MarkdownWriter that uses the identifier to figure out the datatype
 		this.registerWriter("JSON", new JsonWriter());
 		this.registerWriter("YAML", new YamlWriter());
-		this.registerWriter("Ability: XML", new XmlAbilityWriter());
-		this.registerWriter("Ability: Markdown", new MarkdownAbilityWriter());
 		this.registerWriter("Statblock: Markdown", new MarkdownStatblockWriter());
+		this.registerWriter("Ability: Markdown", new MarkdownAbilityWriter());
+		this.registerWriter("Ability: XML", new XmlAbilityWriter());
+		this.registerWriter("Featureblock: Markdown", new MarkdownFeatureblockWriter());
 
 		// Extractors
 		// this.registerExtractor("Prerelease PDF Statblock Text", new PrereleasePdfStatblockExtractor());

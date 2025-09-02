@@ -257,7 +257,7 @@ function App() {
 										InputProps={{
 											readOnly: true,
 										}}
-										placeholder="Converted ability or statblock will appear here..."
+										placeholder="Converted data will appear here..."
 									/>
 								</Box>
 							</Paper>

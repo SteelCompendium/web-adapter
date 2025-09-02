@@ -3,6 +3,11 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { Buffer } from "buffer";
+
+if (!globalThis.Buffer) {
+	globalThis.Buffer = Buffer;
+}
 
 const theme = createTheme({
 	palette: {
